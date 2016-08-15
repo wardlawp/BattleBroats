@@ -8,3 +8,5 @@ __pycache__/
 *.txt~
 *.db
 *.json
+.project
+.pydevproject
