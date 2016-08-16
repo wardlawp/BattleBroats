@@ -7,6 +7,7 @@ from GameSocket import GameSocket, ConnectionEndedException
 import select
 import socket
 import errno
+from Protocol import Request
 
 class ServerSocket(GameSocket):
     '''
@@ -27,7 +28,7 @@ class ServerSocket(GameSocket):
         newConnectionIds = []
 
         inputs = [self.socket]
-        incoming, writable, exceptional = select.select(inputs, [], inputs, self.TIMEOUT)
+        incoming, w, e = select.select(inputs, [], inputs, self.TIMEOUT)
 
         for i in incoming:
             if i == self.socket:
@@ -42,6 +43,9 @@ class ServerSocket(GameSocket):
     def conn(self, connectionId):
         return self.__cons[connectionId]
     
+    def numConnections(self):
+        return len(self.__cons)
+    
     def poll(self):
         msgs = {}
         droppedConnectionIds = []
@@ -50,7 +54,8 @@ class ServerSocket(GameSocket):
             conn = self.__cons[ip]
 
             try:
-                msgs[ip] = self._receive(conn)
+                msg = self._receive(conn) 
+                msgs[ip] = Request.deserialize(msg)
             except socket.error, e:
                 err = e.args[0]
                 if err == errno.EAGAIN or err == errno.EWOULDBLOCK:

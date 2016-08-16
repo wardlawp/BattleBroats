@@ -8,39 +8,43 @@ from Sockets import ServerSocket
 
 TCP_IP = '127.0.0.1'
 TCP_PORT = 5005
-
+NUM_PLAYERS = 1
 
 if __name__ == '__main__':
-    # Accept two connections
-    #     On connect do Client negotiation (get name, tell wait)
-    #     Ignore first Client and wait for second
     
-    # Two connects? Start game
-    #    Send Clients game start and maps
-    #    Wait for client commands, respond to commands
-    #    When games state is appropriate, update clients
-    #    Client drops? End game
-    
-    
-    s = ServerSocket(2, TCP_IP, TCP_PORT)
+    sock = ServerSocket(NUM_PLAYERS, TCP_IP, TCP_PORT)
     
     print 'Starting polling'
     while True:
 
-        newConnections = s.acceptConnection()
+        # Accept new Players
+        while sock.numConnections() < NUM_PLAYERS:
+            newConnections = sock.acceptConnection()
+            if newConnections:
+                print 'New Connection(s):', newConnections
+                # Add players to game
+                # Send OK response
+                
+        # Set up the game 
+        #    Create game object
+        #    Send Clients game start and maps
         
-        if newConnections:
-            print 'New Connections', newConnections
+        # Play the game. game still going
+        #    Wait for client commands, respond to commands
+        #    When games state is appropriate, update clients
+        #    Client drops? End game
+        #    Throttle the server, 5 ticks per second
+    
 
-        droppedConnections, msgs = s.poll()
+        droppedConnections, requests = sock.poll()
         
         
         if droppedConnections:
             print  'Dropped Connections', droppedConnections
         
-        if msgs:
-            for key in msgs:
-                print 'Received: ' +  msgs[key]
-                s._send(s.conn(key), 'OK')
+        if requests:
+            for clientId in requests:
+                print 'Received from ' + str(clientId) + ' :' +  requests[clientId]
+                sock._send(sock.conn(clientId), 'OK')
     
 

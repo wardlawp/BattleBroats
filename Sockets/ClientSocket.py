@@ -4,7 +4,7 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 from GameSocket import GameSocket
-
+from Protocol import Request
 class ClientSocket(GameSocket):
     '''
     classdocs
@@ -17,8 +17,9 @@ class ClientSocket(GameSocket):
         self.socket.connect((address, port))
 
 
-    def request(self, msg):
-        self._send(self.socket, msg)
+    def sendRequest(self, request):
+        assert isinstance(request, Request)
+        self._send(self.socket, request.serialize())
         return self._receive(self.socket)
     
     def disconnect(self):
