@@ -21,6 +21,6 @@ if __name__ == '__main__':
     request = Request(Request.STATUS_OK, board)
     
     
-    print sock.sendRequest(request)
+    print sock.sendRequest(request).status
 
     

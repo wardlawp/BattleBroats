@@ -4,7 +4,7 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 from GameSocket import GameSocket
-from Protocol import Request
+from Protocol import Request, Response
 class ClientSocket(GameSocket):
     '''
     classdocs
@@ -18,9 +18,12 @@ class ClientSocket(GameSocket):
 
 
     def sendRequest(self, request):
-        assert isinstance(request, Request)
-        self._send(self.socket, request.serialize())
-        return self._receive(self.socket)
+        return GameSocket.sendRequest(self, self.socket, request)
+    
+    def sendResponse(self,  response):
+        GameSocket.sendResponse(self, self.socket, response)
+      
+
     
     def disconnect(self):
         self.socket.close()

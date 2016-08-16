@@ -5,7 +5,7 @@ Created on Aug 16, 2016
 '''
 from Packet import Packet
 from Transmittable import Transmittable
-import BattleBroats
+import BattleBroats  #TODO does this package have to know of other packages?
 
 class Request(Packet):
     '''
@@ -15,12 +15,12 @@ class Request(Packet):
     STATUSES = [STATUS_OK]
 
 
+    #TODO refactor constructor with Response
     def __init__(self, status, content):
         assert isinstance(content, Transmittable), 'Content must implement Transmittable Interface'
         assert status in self.STATUSES
         
         self.__status =  status
-
         self.__content = content
         
     @property
@@ -32,13 +32,9 @@ class Request(Packet):
     def content(self):
         return self.__content
     
-
-    def serialize(self):
-        return Packet.serialize(self)
         
     @staticmethod
     def deserialize(string):
         status, contentType, content = Packet.deserialize(string)
-        print contentType
         cls = eval(contentType)
         return Request(status, cls.deserialize(content))

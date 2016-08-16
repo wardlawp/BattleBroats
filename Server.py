@@ -4,6 +4,7 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 from Sockets import ServerSocket
+from Protocol import Response
 
 
 TCP_IP = '127.0.0.1'
@@ -45,6 +46,6 @@ if __name__ == '__main__':
         if requests:
             for clientId in requests:
                 print 'Received from ' + str(clientId) + ' :' +  str(requests[clientId].content)
-                sock._send(sock.conn(clientId), 'OK')
+                sock.sendResponse(sock.conn(clientId), Response(Response.STATUS_OK))
     
 

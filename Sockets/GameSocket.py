@@ -4,6 +4,7 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 import socket
+from Protocol import Request, Response
 
 class ConnectionEndedException(Exception):
     
@@ -23,6 +24,15 @@ class GameSocket(object):
 
     def connect(self, host, port):
         self.socket.connect((host, port))
+        
+    def sendRequest(self, conn, request):
+        assert isinstance(request, Request)
+        self._send(conn, request.serialize())
+        return Response.deserialize(self._receive(conn))
+    
+    def sendResponse(self, conn, response):
+        assert isinstance(response, Response)
+        self._send(conn, response.serialize())
 
     def _send(self, conn, msg):
 

@@ -15,8 +15,9 @@ class Transmittable(object):
         "Serialize the objects data into JSON"
         return
     
+    @staticmethod
     @abstractmethod
-    def deserialize(string):
-        "Deserialize string to object"
+    def deserialize(data):
+        "Create object from JSON data"
         return
         

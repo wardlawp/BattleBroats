@@ -24,7 +24,6 @@ class Board(Transmittable.Transmittable):
             
     @staticmethod
     def deserialize(data):
-
         return Board(None, None, data)
         
     
@@ -40,4 +39,4 @@ class Board(Transmittable.Transmittable):
         return serialData
     
     def __str__(self, *args, **kwargs):
-       return str(self.__data)
+        return str(self.__data)
