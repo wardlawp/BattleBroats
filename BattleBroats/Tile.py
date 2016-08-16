@@ -6,8 +6,7 @@ Created on Aug 16, 2016
 
 import abc
 from Protocol import Transmittable
-
-class Tile(Transmittable):
+class Tile(Transmittable.Transmittable):
     '''
     classdocs
     '''
@@ -23,5 +22,6 @@ class Tile(Transmittable):
         return 'hi'
     
 
-    def deserialize(self, string):
+    @staticmethod
+    def deserialize(string):
         print string

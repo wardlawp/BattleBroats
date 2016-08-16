@@ -54,7 +54,7 @@ class Packet(object):
         status = obj.status
         content = obj.content
         contentClass = content.__class__
-        contentType =  contentClass.__module__ +  '.' + contentClass.__name__
+        contentType =  contentClass.__module__ 
         content = content.serialize()
         
         data = {Packet.STATUS_KEY: status, 

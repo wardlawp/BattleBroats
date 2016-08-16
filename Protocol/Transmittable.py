@@ -16,7 +16,7 @@ class Transmittable(object):
         return
     
     @abstractmethod
-    def deserialize(self, string):
+    def deserialize(string):
         "Deserialize string to object"
         return
         

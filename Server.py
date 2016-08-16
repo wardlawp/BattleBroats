@@ -44,7 +44,7 @@ if __name__ == '__main__':
         
         if requests:
             for clientId in requests:
-                print 'Received from ' + str(clientId) + ' :' +  requests[clientId]
+                print 'Received from ' + str(clientId) + ' :' +  str(requests[clientId].content)
                 sock._send(sock.conn(clientId), 'OK')
     
 

@@ -47,7 +47,7 @@ class ServerSocket(GameSocket):
         return len(self.__cons)
     
     def poll(self):
-        msgs = {}
+        requests = {}
         droppedConnectionIds = []
         
         for ip in self.__cons:
@@ -55,7 +55,7 @@ class ServerSocket(GameSocket):
 
             try:
                 msg = self._receive(conn) 
-                msgs[ip] = Request.deserialize(msg)
+                requests[ip] = Request.deserialize(msg)
             except socket.error, e:
                 err = e.args[0]
                 if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
@@ -71,6 +71,6 @@ class ServerSocket(GameSocket):
             del self.__cons[conId]
 
         
-        return droppedConnectionIds, msgs
+        return droppedConnectionIds, requests
             
         

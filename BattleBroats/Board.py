@@ -5,22 +5,27 @@ Created on Aug 16, 2016
 '''
 from Tile import Tile
 from Protocol import Transmittable
+import json
 
-class Board(Transmittable):
+class Board(Transmittable.Transmittable):
     '''
     classdocs
     '''
 
 
-    def __init__(self, nRows, nCols):
+    def __init__(self, nCols = None, nRows= None, data = None):
         '''
         Constructor
         '''
-        self.__data = [[Tile() for y in xrange(nCols)] for x in xrange(nRows)]
-        
-    
-    def deserialize(self, string):
-        print string
+        if data is None:
+            self.__data = [[Tile() for y in xrange(nCols)] for x in xrange(nRows)]
+        else:
+            self.__data = data
+            
+    @staticmethod
+    def deserialize(data):
+
+        return Board(None, None, data)
         
     
     def serialize(self):
@@ -33,3 +38,6 @@ class Board(Transmittable):
             serialData.append(serialRow)
                 
         return serialData
+    
+    def __str__(self, *args, **kwargs):
+       return str(self.__data)

@@ -5,7 +5,7 @@ Created on Aug 16, 2016
 '''
 from Packet import Packet
 from Transmittable import Transmittable
-
+import BattleBroats
 
 class Request(Packet):
     '''
@@ -40,5 +40,5 @@ class Request(Packet):
     def deserialize(string):
         status, contentType, content = Packet.deserialize(string)
         print contentType
-        print eval(contentType)
-        return Request(status, contentType.deserialize(content))
+        cls = eval(contentType)
+        return Request(status, cls.deserialize(content))
