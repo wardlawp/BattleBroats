@@ -6,8 +6,8 @@ Created on Aug 15, 2016
 
 
 from Sockets import ClientSocket
-from BattleBroats import Board
-from Protocol import Request
+from BattleBroats import Game
+from Protocol import Request, StringMessage
 
 TCP_IP = '127.0.0.1'
 TCP_PORT = 5005
@@ -17,10 +17,10 @@ if __name__ == '__main__':
     sock = ClientSocket()
     sock.connect(TCP_IP, TCP_PORT)
     
-    board = Board(2,2)
-    request = Request(Request.STATUS_OK, board)
+
+    request = Request(StringMessage(Game.JOIN))
     
     
-    print sock.sendRequest(request).status
+    print sock.sendRequest(request).content
 
     

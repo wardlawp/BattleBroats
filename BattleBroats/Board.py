@@ -24,6 +24,15 @@ class Board(Transmittable.Transmittable):
             
     @staticmethod
     def deserialize(data):
+        deserialzedData = []
+        
+        for row in data:
+            deserialzedRow = []
+            for el in row:
+                deserialzedRow.append(Tile.deserialize(el))
+            deserialzedData.append(deserialzedRow)
+            
+            
         return Board(None, None, data)
         
     

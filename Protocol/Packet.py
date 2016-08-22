@@ -44,19 +44,16 @@ class Packet(object):
                 data[Packet.CONTENT_KEY]]
     
     def serialize(self):
-        return Packet.__serialize(self)
-    
-    @staticmethod  
-    def __serialize(obj):
-        assert isinstance(obj, Packet), 'Invalid object supplied, must be of type Packet'
+        "Prepare the body of the Packet to be transmitted"
+        assert isinstance(self, Packet), 'Invalid object supplied, must be of type Packet'
         
-        status = obj.status
+        status = self.status
         contentType = None
         content = None
         
-        if obj.content:
-            contentType =  obj.content.__module__ 
-            content = obj.content.serialize()
+        if self.content:
+            contentType =  self.content.__module__ 
+            content = self.content.serialize()
         
         data = {Packet.STATUS_KEY: status, 
                 Packet.CONTENT_TYPE_KEY: contentType, 

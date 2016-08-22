@@ -5,6 +5,8 @@ Created on Aug 16, 2016
 '''
 from Packet import Packet
 from Transmittable import Transmittable
+import BattleBroats  #TODO does this package have to know of other packages?
+import Protocol
 
 class Response(Packet):
     '''

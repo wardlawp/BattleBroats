@@ -39,6 +39,13 @@ class ServerSocket(GameSocket):
         
         return newConnectionIds
     
+            
+    def sendManyResponses(self, responseDict):
+        for id in responseDict:
+            self.sendResponse(self.conn(id), responseDict[id])
+    
+    def connIds(self):
+        return self.__cons.keys()
 
     def conn(self, connectionId):
         return self.__cons[connectionId]
@@ -54,14 +61,11 @@ class ServerSocket(GameSocket):
             conn = self.__cons[ip]
 
             try:
-                msg = self._receive(conn) 
-                requests[ip] = Request.deserialize(msg)
+                requests[ip] = self.recieveRequest(conn)
             except socket.error, e:
-                err = e.args[0]
-                if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
-                    pass
-                else:
+                if not self.__asynResponse(e):
                     raise e
+               
             except ConnectionEndedException, ce:
                 droppedConnectionIds.append(ip)
         
@@ -72,5 +76,9 @@ class ServerSocket(GameSocket):
 
         
         return droppedConnectionIds, requests
-            
+    
+    def __asynResponse(self, e):
+        err = e.args[0]
+        return err == errno.EAGAIN or err == errno.EWOULDBLOCK
+
         

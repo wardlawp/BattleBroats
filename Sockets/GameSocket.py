@@ -12,9 +12,10 @@ class ConnectionEndedException(Exception):
         Exception.__init__(self, msg)
 
 class GameSocket(object):
-    '''
-    classdocs
-    '''
+    """
+    Base Socket class for connecting, sending Requests and receiving Responses
+    
+    """
     DELIM = '%'
     CHNK_SIZE = 4096
 
@@ -27,14 +28,18 @@ class GameSocket(object):
         
     def sendRequest(self, conn, request):
         assert isinstance(request, Request)
-        self._send(conn, request.serialize())
-        return Response.deserialize(self._receive(conn))
+        self.__sendString(conn, request.serialize())
+        return Response.deserialize(self.__receive(conn))
     
     def sendResponse(self, conn, response):
         assert isinstance(response, Response)
-        self._send(conn, response.serialize())
+        self.__sendString(conn, response.serialize())
 
-    def _send(self, conn, msg):
+    def recieveRequest(self, conn):
+        msg = self.__receive(conn) 
+        return Request.deserialize(msg)
+    
+    def __sendString(self, conn, msg):
 
         assert isinstance(msg, str), 'msg must be string'
 
@@ -46,7 +51,9 @@ class GameSocket(object):
                 raise RuntimeError("socket connection broken")
             totalsent = totalsent + sent
 
-    def _receive(self, conn):
+    
+
+    def __receive(self, conn):
         chunks = []
 
         while 1:

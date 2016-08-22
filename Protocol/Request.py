@@ -6,21 +6,22 @@ Created on Aug 16, 2016
 from Packet import Packet
 from Transmittable import Transmittable
 import BattleBroats  #TODO does this package have to know of other packages?
+import Protocol
 
 class Request(Packet):
     '''
     classdocs
     '''
     STATUS_OK = 1
-    STATUSES = [STATUS_OK]
+
 
 
     #TODO refactor constructor with Response
-    def __init__(self, status, content):
+    def __init__(self, content):
         assert isinstance(content, Transmittable), 'Content must implement Transmittable Interface'
-        assert status in self.STATUSES
+
         
-        self.__status =  status
+        self.__status =  Request.STATUS_OK
         self.__content = content
         
     @property
@@ -37,4 +38,4 @@ class Request(Packet):
     def deserialize(string):
         status, contentType, content = Packet.deserialize(string)
         cls = eval(contentType)
-        return Request(status, cls.deserialize(content))
+        return Request(cls.deserialize(content))
