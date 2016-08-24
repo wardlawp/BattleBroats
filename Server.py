@@ -4,7 +4,6 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 from Sockets import ServerSocket
-from Protocol import Request, StringMessage
 from BattleBroats import Game
 from pygame.time import Clock
 

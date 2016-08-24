@@ -3,7 +3,7 @@ Created on Aug 21, 2016
 
 @author: Philip Wardlaw
 '''
-from Protocol.Transmittable import Transmittable
+from transmittable import Transmittable
 
 
 class StringMessage(Transmittable):

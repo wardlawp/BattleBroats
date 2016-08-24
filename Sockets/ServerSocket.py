@@ -3,11 +3,10 @@ Created on Aug 15, 2016
 
 @author: Philip Wardlaw
 '''
-from GameSocket import GameSocket, ConnectionEndedException
+from gameSocket import GameSocket, ConnectionEndedException
 import select
 import socket
 import errno
-from Protocol import Request
 
 class ServerSocket(GameSocket):
     '''

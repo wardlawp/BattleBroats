@@ -3,11 +3,11 @@ Created on Aug 16, 2016
 
 @author: Philip Wardlaw
 '''
-from Tile import Tile
+from tile import Tile
 from Protocol import Transmittable
 import json
 
-class Board(Transmittable.Transmittable):
+class Board(Transmittable):
     '''
     classdocs
     '''

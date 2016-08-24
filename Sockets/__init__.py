@@ -1,2 +1,2 @@
-from ServerSocket import ServerSocket
-from ClientSocket import ClientSocket
+from serverSocket import ServerSocket
+from clientSocket import ClientSocket

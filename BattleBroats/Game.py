@@ -4,7 +4,7 @@ Created on Aug 16, 2016
 @author: Philip Wardlaw
 '''
 
-from Board import Board
+from board import Board
 import Protocol
 class Game(object):
     
@@ -32,7 +32,7 @@ class Game(object):
         responses = {}
         for id in requestDict:
             request = requestDict[id]
-            assert isinstance(request, Protocol.Request)
+            assert isinstance(request, Protocol.request)
             
             _type = type(request.content)
             

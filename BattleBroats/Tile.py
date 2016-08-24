@@ -6,7 +6,8 @@ Created on Aug 16, 2016
 
 
 from Protocol import Transmittable
-class Tile(Transmittable.Transmittable):
+
+class Tile(Transmittable):
 
     WATER = 0
     BROAT = 1

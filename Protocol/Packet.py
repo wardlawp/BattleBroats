@@ -5,7 +5,7 @@ Created on Aug 16, 2016
 '''
 import json
 from abc import ABCMeta, abstractproperty
-from Transmittable import Transmittable
+from transmittable import Transmittable
 
 
 class Packet(object):
