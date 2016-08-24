@@ -36,5 +36,7 @@ class Request(Packet):
     @staticmethod
     def deserialize(string):
         status, contentType, content = Packet.deserialize(string)
+        print status, contentType, content
+        
         cls = eval(contentType)
         return Request(cls.deserialize(content))

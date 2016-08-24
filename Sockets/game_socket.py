@@ -5,7 +5,7 @@ Created on Aug 15, 2016
 '''
 import socket
 from Protocol import Response
-from Protocol import request
+from Protocol import Request
 
 class ConnectionEndedException(Exception):
     
@@ -28,7 +28,7 @@ class GameSocket(object):
         self.socket.connect((host, port))
         
     def sendRequest(self, conn, request):
-        assert isinstance(request, request)
+        assert isinstance(request, Request)
         self.__sendString(conn, request.serialize())
         return Response.deserialize(self.__receive(conn))
     
@@ -38,7 +38,7 @@ class GameSocket(object):
 
     def recieveRequest(self, conn):
         msg = self.__receive(conn) 
-        return request.deserialize(msg)
+        return Request.deserialize(msg)
     
     def __sendString(self, conn, msg):
 

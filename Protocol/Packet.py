@@ -52,11 +52,12 @@ class Packet(object):
         content = None
         
         if self.content:
-            contentType =  self.content.__module__ 
+            contentType =  self.content.__module__ + '.' + self.content.__class__.__name__
             content = self.content.serialize()
         
         data = {Packet.STATUS_KEY: status, 
                 Packet.CONTENT_TYPE_KEY: contentType, 
                 Packet.CONTENT_KEY: content}
 
+        print data
         return json.dumps(data)

@@ -3,7 +3,7 @@ Created on Aug 15, 2016
 
 @author: Philip Wardlaw
 '''
-from gameSocket import GameSocket
+from game_socket import GameSocket
 class ClientSocket(GameSocket):
     '''
     classdocs
