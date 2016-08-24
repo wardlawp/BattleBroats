@@ -7,7 +7,10 @@ from transmittable import Transmittable
 
 
 class StringMessage(Transmittable):
-
+    """
+    A Transmittable Class that contains a string.
+    Can be transmitted within a Packet over a GameSocket
+    """
 
     def __init__(self, msg):
         assert isinstance(msg, str) or isinstance(msg, unicode)

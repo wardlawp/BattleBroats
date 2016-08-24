@@ -8,17 +8,12 @@ from transmittable import Transmittable
 
 
 class Request(Packet):
-    '''
-    classdocs
-    '''
+    "Request Packet for sending a request over Network"
     STATUS_OK = 1
 
-
-
-    #TODO refactor constructor with Response
     def __init__(self, content):
-        assert isinstance(content, Transmittable), 'Content must implement Transmittable Interface'
-
+        errorMsg = 'Content must implement Transmittable Interface'
+        assert isinstance(content, Transmittable), errorMsg
         
         self.__status =  Request.STATUS_OK
         self.__content = content
@@ -35,8 +30,4 @@ class Request(Packet):
         
     @staticmethod
     def deserialize(string):
-        status, contentType, content = Packet.deserialize(string)
-        print status, contentType, content
-        
-        cls = eval(contentType)
-        return Request(cls.deserialize(content))
+        Packet.deserialize(Request, string)

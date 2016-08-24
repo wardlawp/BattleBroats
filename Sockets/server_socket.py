@@ -4,26 +4,37 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 from game_socket import GameSocket, ConnectionEndedException
+from Protocol import Request, Response
 import select
 import socket
 import errno
 
 class ServerSocket(GameSocket):
-    '''
-    classdocs
-    '''
+    ""
    
     TIMEOUT = 0.0
 
 
     def __init__(self, numConnections, ip, port):
+        "Create a ServerSocjet that listens for connections on a ip:port"
         GameSocket.__init__(self)
+
+        #Set Socket as non blocking so we can process connections async
         self.socket.setblocking(0)
         self.socket.bind((ip, port))
         self.socket.listen(numConnections)
         self.__cons = {}
 
+    def recieveRequest(self, conn):
+        msg = self.receiveString(conn) 
+        return Request.deserialize(msg)
+
+    def sendResponse(self, conn, response):
+        assert isinstance(response, Response)
+        self.sendString(conn, response.serialize())
+
     def acceptConnection(self):
+        "Accept available connections asyn"
         newConnectionIds = []
 
         inputs = [self.socket]

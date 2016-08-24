@@ -32,7 +32,7 @@ class Game(object):
         responses = {}
         for id in requestDict:
             request = requestDict[id]
-            assert isinstance(request, Protocol.request)
+            assert isinstance(request, Protocol.Request)
             
             _type = type(request.content)
             

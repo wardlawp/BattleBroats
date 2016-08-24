@@ -6,18 +6,18 @@ Created on Aug 16, 2016
 from abc import ABCMeta, abstractmethod
 
 class Transmittable(object):
-    'Any object that wants to be transmitted must implement this class'
+    'An Abstract Class for transmitting Data via Packets'
     __metaclass__ = ABCMeta
 
 
     @abstractmethod
     def serialize(self):
-        "Serialize the objects data into JSON"
+        "Serialize the Transmittable object into JSON"
         return
     
     @staticmethod
     @abstractmethod
     def deserialize(data):
-        "Create object from JSON data"
+        "Create Transmittable object from JSON data"
         return
         
