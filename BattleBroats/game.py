@@ -32,6 +32,7 @@ class Game(object):
         responses = {}
         for id in requestDict:
             request = requestDict[id]
+
             assert isinstance(request, Protocol.Request)
             
             _type = type(request.content)
@@ -39,9 +40,9 @@ class Game(object):
             if _type == Protocol.StringMessage:
                 verb = request.content.serialize()
                 if verb == self.VIEW:
-                    responses[id] = Protocol.Response(1, self.__boards[id])
+                    responses[id] = Protocol.Response(self.__boards[id], 1)
                 elif verb == self.JOIN:
                     self.addPlayers(id)
-                    responses[id] = Protocol.Response(1, self.__boards[id])
+                    responses[id] = Protocol.Response(self.__boards[id], 1)
                     
         return responses

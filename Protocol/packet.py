@@ -16,7 +16,7 @@ class Packet(object):
     CONTENT_MODULE_KEY='contentModule'
     CONTENT_CLASS_KEY='contentClass'
     CONTENT_KEY='content'
-    KEYS = [STATUS_KEY, CONTENT_PACKAGE_KEY, CONTENT_CLASS_KEY, CONTENT_KEY]
+    KEYS = [STATUS_KEY, CONTENT_MODULE_KEY, CONTENT_CLASS_KEY, CONTENT_KEY]
 
     @abstractproperty
     def status(self):
@@ -50,12 +50,12 @@ class Packet(object):
         "Construct a _type with internal Transmittable from serialized Packet"
         status, contentModule, contentClass, content = Packet.__deserializePayload(string)
 
-        _module = __import__(contentPackage)
+        _module = __import__(contentModule)
         _class = getattr(_module, contentClass)
 
         assert issubclass(_class, Transmittable)
 
-        return _type(_class.deserialize(content))
+        return _type(_class.deserialize(content), status)
     
     def serialize(self):
         "Prepare the body of the Packet to be transmitted"

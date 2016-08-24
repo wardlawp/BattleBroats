@@ -11,11 +11,11 @@ class Request(Packet):
     "Request Packet for sending a request over Network"
     STATUS_OK = 1
 
-    def __init__(self, content):
+    def __init__(self, content, status = STATUS_OK):
         errorMsg = 'Content must implement Transmittable Interface'
         assert isinstance(content, Transmittable), errorMsg
         
-        self.__status =  Request.STATUS_OK
+        self.__status =  status
         self.__content = content
         
     @property
@@ -30,4 +30,4 @@ class Request(Packet):
         
     @staticmethod
     def deserialize(string):
-        Packet.deserialize(Request, string)
+        return Packet.deserialize(Request, string)

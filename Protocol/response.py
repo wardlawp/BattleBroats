@@ -14,12 +14,12 @@ class Response(Packet):
     STATUSES = [STATUS_OK, STATUS_NOT_OK, STATUS_ERROR]
 
 
-    def __init__(self, status, content = None):
+    def __init__(self, content, status):
         "Responses do not necessarily have content"
         if content:
             msg = 'Content must implement Transmittable Interface'
             assert isinstance(content, Transmittable), msg
-
+        
         assert status in self.STATUSES
         
         self.__status =  status
@@ -36,4 +36,4 @@ class Response(Packet):
     
     @staticmethod
     def deserialize(string):
-        Packet.deserialize(Response, string)
+        return Packet.deserialize(Response, string)

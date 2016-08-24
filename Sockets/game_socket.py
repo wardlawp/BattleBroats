@@ -19,6 +19,7 @@ class GameSocket(object):
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__msgOverflow = ''
 
     def sendString(self, conn, msg):
         "Send a string to a connection/socket"
@@ -48,7 +49,11 @@ class GameSocket(object):
         lastChunk = chunks[-1]
         chunks[-1] = lastChunk[:lastChunk.find(self.DELIM)]
 
-        return ''.join(chunks)
+        msg = self.__msgOverflow.join(chunks)
+        self.__msgOverflow = lastChunk[(lastChunk.find(self.DELIM) +1):]
+
+        return msg
+    
 
     def __getChunk(self, conn, chunkSize):
         chunk = conn.recv(chunkSize)
