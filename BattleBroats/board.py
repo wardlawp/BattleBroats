@@ -25,7 +25,6 @@ class Board(Transmittable):
     @staticmethod
     def deserialize(data):
         deserialzedData = []
-        
         for row in data:
             deserialzedRow = []
             for el in row:
@@ -48,4 +47,4 @@ class Board(Transmittable):
         return serialData
     
     def __str__(self, *args, **kwargs):
-        return str(self.__data)
+        return 'Board:' + str(self.__data)

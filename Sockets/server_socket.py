@@ -34,7 +34,7 @@ class ServerSocket(GameSocket):
         self.sendString(conn, response.serialize())
 
     def acceptConnection(self):
-        "Accept available connections asyn"
+        "Accept available connections Async"
         newConnectionIds = []
 
         inputs = [self.socket]

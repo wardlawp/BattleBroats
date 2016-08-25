@@ -18,13 +18,21 @@ def printCommunication(requests, responses):
     
     def __print(preMsg, packetDict):
         for clientId in requests:
+            print preMsg
             
-            msg = preMsg + str(clientId) + ': STATUS ' 
-            + packetDict[clientId].status
-            + ', CONTNET' + str(packetDict[clientId].content)
+            spacer = '  '
             
-            print msg
+            print spacer, 'From/To:', clientId
+            print spacer, 'Status:', packetDict[clientId].status
+            print spacer, 'Content:',  packetDict[clientId].content
+            
 
+    if(requests):
+        __print("Request: ", requests)
+    
+    if(responses):
+        __print("Response: ", responses)
+    
 
 if __name__ == '__main__':
     

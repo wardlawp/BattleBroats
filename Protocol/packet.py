@@ -62,8 +62,7 @@ class Packet(object):
         assert isinstance(self, Packet), 'Invalid object supplied, must be of type Packet'
         
         status = self.status
-        contentType = None
-        content = None
+        contentModule, contentClass, content = None, None, None
         
         if self.content:
             contentModule =  self.content.__module__ 

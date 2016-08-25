@@ -21,7 +21,9 @@ class ClientSocket(GameSocket):
     def sendRequest(self, request):
         "Send a Request, wait and receive the Response"
         assert isinstance(request, Request)
+        
         self.sendString(self.socket, request.serialize())
+       
         msg = self.receiveString(self.socket)
         return Response.deserialize(msg)
      

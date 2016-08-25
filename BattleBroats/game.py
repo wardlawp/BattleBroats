@@ -15,6 +15,8 @@ class Game(object):
 
 
     def __init__(self):
+        
+        self.communicationHanlder = 
 
         self.__players = []
         self.__boards = {}
@@ -24,7 +26,6 @@ class Game(object):
         return True
         
     def addPlayers(self, player):
-        print player
         self.__players.append(player)
         self.__boards[player] = Board(5,5)
  
