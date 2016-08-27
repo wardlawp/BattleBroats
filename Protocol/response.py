@@ -17,8 +17,7 @@ class Response(Packet):
     def __init__(self, content, status):
         "Responses do not necessarily have content"
         if content:
-            msg = 'Content must implement Transmittable Interface'
-            assert isinstance(content, Transmittable), msg
+            self.testConstructorContentInputs(content)
         
         assert status in self.STATUSES
         
