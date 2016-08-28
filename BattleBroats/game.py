@@ -15,11 +15,19 @@ class Game(Subject):
     MODE_CLIENT = 1
     MAX_PLAYERS = 2
     
+    CLIENT_SELF = 'self'
+    CLIENT_OTHER = 'other'
+    
+    BOARD_SIZE = (8,10)
+    BROATS = (4,4,3,3,2,2)
+    
     
     EVENT_BOARD_CHANGED = 20
 
 
     def __init__(self, mode):
+        
+        self.__mode = mode
         
         if mode == self.MODE_SERVER:
             self.__state = ServerStartState(self)
@@ -74,7 +82,11 @@ class Game(Subject):
         
     def addPlayers(self, player):
         self.__players.append(player)
-        self.boards[player] = Board(5,5)
+        self.boards[player] = Board(*self.BOARD_SIZE)
+        if self.__mode == self.MODE_SERVER:
+            self.boards[player].addBroats(self.BROATS)
+
+            
  
     def update(self, packetDict, inputs = None):
         packets = self.__state.handle(packetDict, inputs)

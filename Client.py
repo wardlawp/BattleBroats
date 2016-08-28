@@ -8,7 +8,7 @@ Created on Aug 15, 2016
 from Sockets import ClientSocket
 from BattleBroats import Game
 from pygame.time import Clock
-from game_logging import printCommunication
+from log import printCommunication
 from UI import ClientTextUI
 
 TCP_IP = '127.0.0.1'
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     
     request = None
     response = None
-    input = None
+    userInput = None
     
     while game.inProgress():
        
@@ -41,13 +41,13 @@ if __name__ == '__main__':
         else:
             response = None
             
-        request  = game.update(response, input)
+        request  = game.update(response, userInput)
         
         if DEBUG:
             printCommunication([request], [response])
         
         ui.draw()
-        input = ui.input()
+        userInput = ui.input()
         
         
         tickClock.tick(CLIENT_TICK)

@@ -19,16 +19,21 @@ class Tile(Transmittable):
 
     def __init__(self, _type = WATER ):
         assert _type in Tile.VALID_TYPES
-        self._type = _type
+        self.type = _type
     
     def __str__(self):
-        return self._type
+        return self.type
     
+    def __ne__(self, other):
+        return not self.__eq__(other)
     def __eq__(self, other):
-        return self._type == other._type
+        if isinstance(other, int):
+            return self.type == other
+        
+        return self.type == other.type
     
     def serialize(self):
-        return self._type
+        return self.type
     
     @staticmethod
     def deserialize(string):

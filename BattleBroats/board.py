@@ -6,6 +6,7 @@ Created on Aug 16, 2016
 from tile import Tile
 from Protocol import Transmittable
 import json
+from random import randint, shuffle
 
 class Board(Transmittable):
     '''
@@ -22,31 +23,60 @@ class Board(Transmittable):
         else:
             self.__data = data
     
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    def nCols(self):
+        return len(self.__data[0])
     
-    def __eq__(self, other):
-        
-        if len(self.__data) != len(other.__data):
-            return False
-        
-        for x in range(len(self.__data)):
+    def nRows(self):
+        return len(self.__data)
+
+    def element(self, rowIdx, colIdx):
+        return  self.__data[rowIdx][colIdx]
+    
+    
+    def addBroats(self, broats):
+        for broat in broats:
+            notPlaced = True
+            while notPlaced: #Potential for inf loop if we actually cant place 
+                x, y = randint(0, self.nRows()-1), randint(0, self.nCols()-1)
+                notPlaced = not self.__tryPlace(x,y,broat)
             
-            if len(self.__data[x]) != len(other.__data[x]):
-                return False
-            
-            for y in range(len(self.__data[x])):
-                if self.__data[x][y] !=  other.__data[x][y]:
-                    return False
+    def __tryPlace(self, x,y, broat):
+        vectors = ((1,0), (-1,0), (0,1), (0,-1))
+        order = range(4)
+        shuffle(order)
+
+        for o in order:
+            broatOccupancy = []
+            for i in range(broat):
+                cell = [x + vectors[o][0]*i, y +  vectors[o][1]*i]
+                broatOccupancy.append(cell)
                 
-        return True
-    
+            canPlace = True
+          
+            for cell in broatOccupancy:
+                if cell[0] >= (self.nRows() -1) or cell[1] >= (self.nCols() -1):
+                    canPlace = False
+                    break
+                
+                if  self.__data[cell[0]][cell[1]] != Tile.WATER:
+                    canPlace = False
+                    break
+                
+            if canPlace:
+                for cell in broatOccupancy:
+                    self.__data[cell[0]][cell[1]] = Tile(Tile.BROAT)
+                return True
+        
+        return False
+            
+        
+        
     def getEnemyView(self):
         enemyViewData = []
         for row in self .__data:
             enemyViewRow = []
             for el in row:
-                if el._type in (Tile.SHOT, Tile.DEAD_BROAT):
+                if el.type in (Tile.SHOT, Tile.DEAD_BROAT):
                     enemyViewRow.append(el)
                 else:
                     enemyViewRow.append(Tile())
@@ -66,7 +96,7 @@ class Board(Transmittable):
             deserialzedData.append(deserialzedRow)
             
             
-        return Board(None, None, data)
+        return Board(None, None, deserialzedData)
         
     
     def serialize(self):
@@ -79,6 +109,26 @@ class Board(Transmittable):
             serialData.append(serialRow)
                 
         return serialData
+    
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
+    def __eq__(self, other):
+        
+        if len(self.__data) != len(other.__data):
+            return False
+        
+        for x in range(len(self.__data)):
+            
+            if len(self.__data[x]) != len(other.__data[x]):
+                return False
+            
+            for y in range(len(self.__data[x])):
+                if self.__data[x][y] !=  other.__data[x][y]:
+                    return False
+                
+        return True
     
     def __str__(self, *args, **kwargs):
         return 'Board:' + str(self.__data)

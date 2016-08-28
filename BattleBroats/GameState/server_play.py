@@ -25,6 +25,7 @@ class ServerPlayState(GameState):
     """
     START = 'START'
     VIEW = 'VIEW'
+    GO = 'GO'
     
     def __init__(self, game):
         GameState.__init__(self, game)

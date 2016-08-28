@@ -9,6 +9,7 @@ from client_play import ClientPlayState
 from server_start import ServerStartState, ServerPlayState
 from Protocol import Response, Request, StringMessage
 
+
 class ClientStartState(GameState):
     'An abstract class for expressing client game behaviour'
     

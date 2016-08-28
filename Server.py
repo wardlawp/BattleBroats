@@ -6,7 +6,7 @@ Created on Aug 15, 2016
 from Sockets import ServerSocket
 from BattleBroats import Game
 from pygame.time import Clock
-from game_logging import printCommunication
+from log import printCommunication
 
 
 TCP_IP = '127.0.0.1'
