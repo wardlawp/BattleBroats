@@ -7,21 +7,49 @@ Created on Aug 15, 2016
 
 from Sockets import ClientSocket
 from BattleBroats import Game
-from Protocol import StringMessage
-from Protocol import Request
+from pygame.time import Clock
+from game_logging import printCommunication
+from UI import ClientTextUI
 
 TCP_IP = '127.0.0.1'
 TCP_PORT = 5005
+CLIENT_TICK = 5
+DEBUG = False
+
+
 
 if __name__ == '__main__':
 
+    print 'Setting up game'
+    game = Game(Game.MODE_CLIENT)
     sock = ClientSocket()
+    tickClock = Clock()
+    ui = ClientTextUI(game)
+    
+    print 'Connecting to Server'
+    
     sock.connect(TCP_IP, TCP_PORT)
     
-
-    request = Request(StringMessage(Game.JOIN))
+    request = None
+    response = None
+    input = None
     
-    
-    print sock.sendRequest(request).content
+    while game.inProgress():
+       
+        if request:
+            response = sock.sendRequest(request)
+        else:
+            response = None
+            
+        request  = game.update(response, input)
+        
+        if DEBUG:
+            printCommunication([request], [response])
+        
+        ui.draw()
+        input = ui.input()
+        
+        
+        tickClock.tick(CLIENT_TICK)
 
     

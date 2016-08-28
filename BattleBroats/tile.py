@@ -11,6 +11,8 @@ class Tile(Transmittable):
 
     WATER = 0
     BROAT = 1
+    DEAD_BROAT = 2
+    SHOT = 3
     
     VALID_TYPES = [WATER, BROAT]
 
@@ -21,6 +23,9 @@ class Tile(Transmittable):
     
     def __str__(self):
         return self._type
+    
+    def __eq__(self, other):
+        return self._type == other._type
     
     def serialize(self):
         return self._type

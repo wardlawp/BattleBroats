@@ -9,7 +9,7 @@ from transmittable import Transmittable
 
 
 class Packet(object):
-    "Packet of information that can be sent or recieved"
+    "Packet of information that can be sent or received"
     __metaclass__ = ABCMeta
     
     STATUS_KEY='status'
@@ -22,11 +22,10 @@ class Packet(object):
     def status(self):
         "Status attribute must return integer"
         return
-    
        
     @abstractproperty
     def content(self):
-        "Content attribute must return Transmittable"
+        "Content attribute must return Transmittable or list of Transmittables"
         return 
 
     @staticmethod
@@ -39,26 +38,11 @@ class Packet(object):
         else:
             errorMsg = 'Content must implement Transmittable Interface'
             assert isinstance(content, Transmittable), errorMsg
-    
-    @staticmethod    
-    def __deserializePayload(string):
-        "Returned string is JSON"
-        
-
-        data = json.loads(string)
-
-        for key in Packet.KEYS:
-            assert key in data.keys(), "Serial data is missing elements"
-        
-        return  [data[Packet.STATUS_KEY], 
-                data[Packet.CONTENT_MODULE_KEY],
-                data[Packet.CONTENT_CLASS_KEY],
-                data[Packet.CONTENT_KEY]]
-
+            
     @staticmethod
     def deserialize(_type, string):
         "Construct a _type with internal Transmittable from serialized Packet"
-        status, contentModule, contentClass, content = Packet.__deserializePayload(string)
+        status, contentModule, contentClass, content = Packet.__deserialize(string)
 
         transmittables = Packet.__deserializeContentPayload(contentModule, contentClass, content)
 
@@ -79,7 +63,25 @@ class Packet(object):
 
         return json.dumps(data)
     
+    @staticmethod    
+    def __deserialize(string):
+        "Convert received string into primitive python types"
+        
+        data = json.loads(string)
+
+        for key in Packet.KEYS:
+            assert key in data.keys(), "Serial data is missing elements"
+        
+        return  [data[Packet.STATUS_KEY], 
+                data[Packet.CONTENT_MODULE_KEY],
+                data[Packet.CONTENT_CLASS_KEY],
+                data[Packet.CONTENT_KEY]]
+
+   
+    
+    
     def __serializeContentPayload(self):
+        
         if self.content == None:
             return None, None, None
         
@@ -103,6 +105,9 @@ class Packet(object):
     
     @staticmethod
     def __deserializeContentPayload(contentModule, contentClass, content):
+        
+        if contentModule == None:
+            return None
         
         if not isinstance(contentModule, list):
                 return Packet.__deserializeTransmittable(contentModule,

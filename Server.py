@@ -6,56 +6,35 @@ Created on Aug 15, 2016
 from Sockets import ServerSocket
 from BattleBroats import Game
 from pygame.time import Clock
+from game_logging import printCommunication
 
 
 TCP_IP = '127.0.0.1'
 TCP_PORT = 5005
-NUM_PLAYERS = 1
 SERVER_TICK = 5
-DEBUG = True
+DEBUG = False
 
-def printCommunication(requests, responses):
-    
-    def __print(preMsg, packetDict):
-        for clientId in requests:
-            print preMsg
-            
-            spacer = '  '
-            
-            print spacer, 'From/To:', clientId
-            print spacer, 'Status:', packetDict[clientId].status
-            print spacer, 'Content:',  packetDict[clientId].content
-            
 
-    if(requests):
-        __print("Request: ", requests)
-    
-    if(responses):
-        __print("Response: ", responses)
-    
 
 if __name__ == '__main__':
     
-    sock = ServerSocket(NUM_PLAYERS, TCP_IP, TCP_PORT)
+    print 'Setting up game'
     
-    print 'Waiting for players polling'
-    
-    
-    
-    game = Game()
+    game = Game(Game.MODE_SERVER)
+    sock = ServerSocket( game.MAX_PLAYERS, TCP_IP, TCP_PORT)
     tickClock = Clock()
     
-
+    print 'Waiting for players'
     
     while game.inProgress():
         
-        if sock.numConnections() < NUM_PLAYERS:
+        if sock.numConnections() < game.MAX_PLAYERS:
             newConnections = sock.acceptConnection()
             if newConnections:
                 print 'New Connection(s):', newConnections
 
         droppedConnections, requestsDict = sock.poll()
-        responsesDict = game.processRequest(requestsDict)
+        responsesDict = game.update(requestsDict, None)
         
         sock.sendManyResponses(responsesDict)
 

@@ -3,10 +3,11 @@ Created on Aug 24, 2016
 
 @author: Philip Wardlaw
 '''
-from game_states import ServerGameState
-from Protocol import Request, StringMessage
+from game_states import GameState
+from server_play import ServerPlayState
+from Protocol import Response, StringMessage
 
-class ServerGameState(ServerGameState):
+class ServerStartState(GameState):
     """
     State class defining behaviour of server at start of game
     
@@ -22,39 +23,43 @@ class ServerGameState(ServerGameState):
     JOIN = 'JOIN'
     
     def __init__(self, game):
-        ServerGameState.__init__(self, game)
+        GameState.__init__(self, game)
         self.__complete = False
-        self.__responses = {}
+
     
     def handle(self, packetsDict, inputs = None):
         responses = {}
         
-        for id in packetsDict:
-            currResonses = len(responses)
-            request = packetsDict[id]
-            assert isinstance(request, Request)
+        for clientId in packetsDict:
+
+            request = packetsDict[clientId]
+            responses[clientId] = self.__handleRequests(clientId, request.content)
             
-            _type = type(request.content)
-            
-            if _type == StringMessage:
-                verb = request.content.msg
                 
-                if verb == self.JOIN:
-                    self.addPlayers(id)
-                    responses[id] = Protocol.Response(self.__boards[id], 1)
-                    
-        self.__responses = responses
+        return  responses
 
     
+    def __handleRequests(self, clientId, content):
+        
+        if isinstance(content, StringMessage) and content.msg == self.JOIN:
+            if self.game.canAddPlayer(clientId):
+                self.game.addPlayers(clientId)
+            
+            self.__complete = self.game.full()
+            
+            return Response(StringMessage(self.JOIN), Response.STATUS_OK)
+        
+        return Response(None, Response.STATUS_NO)      
+     
 
-    def responses(self):
-        "Get Responses after handle()"
-        return self.__responses
     
 
     def nextState(self):
         "Get the GameState that should be used next game loop"
         if self.__complete:
+            return ServerPlayState(self.game) #may cause self not to get GC
+        else:
+            return self
             
     
     

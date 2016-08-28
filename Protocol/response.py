@@ -7,15 +7,15 @@ from packet import Packet
 from transmittable import Transmittable
 
 class Response(Packet):
-    "Response Packet for sending a request over Network"
+    "Response Packet for sending a response over Network"
     STATUS_OK=1
-    STATUS_NOT_OK=2
+    STATUS_NO=2
     STATUS_ERROR=3
-    STATUSES = [STATUS_OK, STATUS_NOT_OK, STATUS_ERROR]
+    STATUSES = [STATUS_OK, STATUS_NO, STATUS_ERROR]
 
 
     def __init__(self, content, status):
-        "Responses do not necessarily have content"
+        #Responses do not necessarily have content
         if content:
             self.testConstructorContentInputs(content)
         
