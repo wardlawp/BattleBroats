@@ -14,7 +14,7 @@ class Tile(Transmittable):
     DEAD_BROAT = 2
     SHOT = 3
     
-    VALID_TYPES = [WATER, BROAT]
+    VALID_TYPES = [WATER, BROAT, DEAD_BROAT, SHOT]
 
 
     def __init__(self, _type = WATER ):

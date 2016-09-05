@@ -24,7 +24,7 @@ class GameSocket(object):
         self.__msgOverflow = ''
         
     def receivePacket(self, conn):
-        "Receive a single Packet Async"
+        "Receive a single Packet Async, returns None if no Packets available"
         try:
             msg = self.__receiveString(conn) 
             return Packet.deserialize(msg)
@@ -48,11 +48,10 @@ class GameSocket(object):
             
         return packets
     
-    def sendPackets(self, packets, conn):
-        "Send a Packet"
-        for p in packets:
-            assert isinstance(p, Packet)
-            self.__sendString(conn, p.serialize())
+    def sendPacket(self, packet, conn):
+        "Send a Packet to a connection"
+        assert isinstance(packet, Packet)
+        self.__sendString(conn, packet.serialize())
 
 
     def __isAsynResponse(self, e):

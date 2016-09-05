@@ -4,52 +4,59 @@ Created on Aug 24, 2016
 @author: Philip Wardlaw
 '''
 
-from game_states import GameState
+from game_states import ClientState
 from client_play import ClientPlayState
 from server_start import ServerStartState, ServerPlayState
-from Network import Packet
+import BattleBroats.constants as gc
 
 
-class ClientStartState(GameState):
-    'An abstract class for expressing client game behaviour'
+class ClientStartState(ClientState):
+    """
+    State class defining behaviour of client at start of game
+    Ask to join, then ask has the game started
+    """
     
     def __init__(self, game):
-        GameState.__init__(self, game)
+        ClientState.__init__(self, game)
         
-        self.__askedToJoin = False
-        self.__serverAcknowledgedJoin = False
+
+        self.__joined = False
         self.__gameStarting = False
     
 
-    def __handleServerPackets(self, packets):
-        for packet in packets:
-            content = packet.content
-            if self.unicodeOrString(content):
-    
-                if content == ServerStartState.JOIN:
-                    self.__serverAcknowledgedJoin = True
-                if content == ServerPlayState.START:
-                    self.__gameStarting = True
-                    self.game.addPlayers('self')
-                    self.game.addPlayers('other')
+    def registerHandlers(self):
+        #define methods
+        def strHandler(content):
+            if content == ServerStartState.JOIN:
+                self.__joined = True
+            elif content == ServerPlayState.START:
+                self.__gameStarting = True
+                self.game.addPlayers(gc.CLIENT_SELF)
+                self.game.addPlayers(gc.CLIENT_OTHER)
+                
+
+        
+        #register methods
+        self.handlers[unicode.__name__] = strHandler
+        self.handlers[str.__name__] = strHandler
+              
 
 
-    def __generatePackets(self):
-        packets = []
-        if not self.__askedToJoin:
-            packets.append(Packet(ServerStartState.JOIN))
-            self.__askedToJoin = True
+    def questions(self):
+
+        if not self.__joined:
+            return [ServerStartState.JOIN]
         elif not self.__gameStarting:
-            packets.append(Packet(ServerPlayState.START))
-        return packets
+            return [ServerPlayState.START]
+        
+        return []
 
     def handle(self, packets, inputs):
 
-        #Handle Responses
-        self.__handleServerPackets(packets) 
-                    
-        #Ask Server Questions
-        return self.__generatePackets()
+        self.handlePackets(packets)
+        responseContent = self.questions()
+        
+        return self.packageContent(responseContent)
             
 
     

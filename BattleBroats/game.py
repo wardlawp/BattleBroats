@@ -6,30 +6,21 @@ Created on Aug 16, 2016
 
 from GameState import ServerStartState, ClientStartState
 from board import Board
+from board_update import BoardUpdate
 from observer import Observer
 from subject import Subject
+from constants import *
 
 class Game(Subject):
     
-    MODE_SERVER = 0
-    MODE_CLIENT = 1
-    MAX_PLAYERS = 2
     
-    CLIENT_SELF = 'self'
-    CLIENT_OTHER = 'other'
-    
-    BOARD_SIZE = (8,10)
-    BROATS = (4,4,3,3,2,2)
-    
-    
-    EVENT_BOARD_CHANGED = 20
 
 
     def __init__(self, mode):
         
         self.__mode = mode
         
-        if mode == self.MODE_SERVER:
+        if mode == MODE_SERVER:
             self.state = ServerStartState(self)
         else:
             self.state = ClientStartState(self)
@@ -41,10 +32,14 @@ class Game(Subject):
     
     def getBoardsFromPerspective(self, playerId):
         otherID = [x for x in self.__players if x != playerId][0]
-        return [self.boards[playerId], self.boards[otherID].getEnemyView()]
+        return [BoardUpdate(self.boards[playerId], CLIENT_SELF), 
+                BoardUpdate(self.boards[otherID].getEnemyView(), CLIENT_OTHER)]
 
     def player(self, idx):
         return self.__players[idx]
+    
+    def players(self):
+        return self.__players
     
     def updateBoards(self, boardDict):
         changed = False
@@ -55,7 +50,7 @@ class Game(Subject):
                 self.boards[pId] = boardDict[pId]
         
         if changed:    
-            self.emmit(self.EVENT_BOARD_CHANGED)
+            self.emmit(EVENT_BOARD_CHANGED)
         
     #region Observer
     def registerObserver(self, observer):
@@ -74,7 +69,7 @@ class Game(Subject):
         return True
     
     def full(self):
-        return self.MAX_PLAYERS <= len(self.__players)
+        return MAX_PLAYERS <= len(self.__players)
     
     def canAddPlayer(self, clinetId):
         room = not self.full()
@@ -84,9 +79,9 @@ class Game(Subject):
         
     def addPlayers(self, player):
         self.__players.append(player)
-        self.boards[player] = Board(*self.BOARD_SIZE)
-        if self.__mode == self.MODE_SERVER:
-            self.boards[player].addBroats(self.BROATS)
+        self.boards[player] = Board(*BOARD_SIZE)
+        if self.__mode == MODE_SERVER:
+            self.boards[player].addBroats(BROATS)
 
             
  

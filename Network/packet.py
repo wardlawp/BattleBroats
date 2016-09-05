@@ -5,7 +5,7 @@ Created on Aug 16, 2016
 '''
 import json
 from transmittable import Transmittable
-from datetime import datetime, time
+from datetime import datetime
 
 class Packet(object):
     "Packet of information that can be sent or received"
@@ -19,9 +19,9 @@ class Packet(object):
 
     def __init__(self, content, timestamp = None):
 
-        if content:
-            self.__testConstructorContentInputs(content)
-            self.content = content
+
+        self.__testConstructorContentInputs(content)
+        self.content = content
             
         if timestamp is None:
             self.timestamp = datetime.now()
@@ -31,18 +31,18 @@ class Packet(object):
 
 
     def __testConstructorContentInputs(self, content):
-        def __test(item):
-            errorMsg = 'Array elements must be objects implementing the Transmittable Interface or be an instance of str'
+        def test(item):
+            errorMsg = 'List elements must be objects implementing the Transmittable Interface or be an instance of str'
             isTransmittable = isinstance(item, Transmittable)
             isStr = isinstance(item, str) or isinstance(item, unicode)
             assert isTransmittable or isStr, errorMsg
             
-        if isinstance(content, list):
-            for c in content:
-                __test(c)   
+        assert isinstance(content, list), "Content must be a list"
         
-        else:
-            __test(content)
+        for c in content:
+            test(c)   
+        
+        
             
     @staticmethod
     def deserialize(string):
@@ -86,38 +86,27 @@ class Packet(object):
     
     
     def __serializeContentPayload(self):
-        
-        if self.content == None:
-            return None, None, None
-        
-        elif isinstance(self.content, list):
+        contentModule =  []
+        contentClass = []
+        content = []
+        for c in self.content:
+            mod = None
+            serialContent = None
+            if not isinstance(c, str):
+                mod = c.__module__     
+                serialContent = c.serialize()
+            else:
+                serialContent = c
+            contentModule.append(mod) 
+            contentClass.append(c.__class__.__name__)
+            content.append(serialContent)
             
-            contentModule =  []
-            contentClass = []
-            content = []
-            for c in self.content:
-                contentModule.append(c.__module__) 
-                contentClass.append(c.__class__.__name__)
-                content.append(c.serialize())
-                
-            return contentModule, contentClass, content
-        else:
-            if isinstance(self.content, str):
-                return None, self.content.__class__.__name__, self.content
-            contentModule =  self.content.__module__ 
-            contentClass = self.content.__class__.__name__
-            content = self.content.serialize()
-            
-            return contentModule, contentClass, content
-    
+        return contentModule, contentClass, content
+        
+        
     @staticmethod
     def __deserializeContentPayload(contentModule, contentClass, content):
         
-        if not isinstance(contentModule, list):
-                return Packet.__deserializeTransmittable(contentModule,
-                                                        contentClass,
-                                                        content)
-            
         transmittables = [] 
         for i in range(len(contentModule)):
             transmittables.append(Packet.__deserializeTransmittable(contentModule[i],

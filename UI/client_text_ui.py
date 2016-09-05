@@ -2,7 +2,7 @@ from observer import Observer
 from BattleBroats import Game, Board, Tile
 import string
 import BattleBroats
-
+from BattleBroats import constants as gc
 
 class ClientTextUI(Observer):
     
@@ -18,16 +18,16 @@ class ClientTextUI(Observer):
         
 
     def recieveEvent(self, event):
-        if event == Game.EVENT_BOARD_CHANGED:
+        if event == gc.EVENT_BOARD_CHANGED:
             self.__requireRedraw = True
             
     def draw(self):
         if self.__requireRedraw:
             
             print '============ Your Board ============'
-            self.__drawBoard(self.subject.boards[Game.CLIENT_SELF])
+            self.__drawBoard(self.subject.boards[gc.CLIENT_SELF])
             print '============ Their Board ==========='
-            self.__drawBoard(self.subject.boards[Game.CLIENT_OTHER])
+            self.__drawBoard(self.subject.boards[gc.CLIENT_OTHER])
             print '===================================='
             
             
@@ -57,6 +57,6 @@ class ClientTextUI(Observer):
         
     def input(self):
         if isinstance(self.subject.state, BattleBroats.GameState.ClientPlayState):
-            if self.subject.state.ourGo:
-                move = input('?')
-                return [move[0], move[1]]
+            if self.subject.state.myGo:
+                move = str(input('?'))
+                return [int(move[0]), int(move[1])]

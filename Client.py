@@ -6,7 +6,7 @@ Created on Aug 15, 2016
 
 
 from Network import ClientSocket
-from BattleBroats import Game
+from BattleBroats import Game, constants as gc
 from pygame.time import Clock
 from log import printCommunication
 from UI import ClientTextUI
@@ -14,14 +14,14 @@ from UI import ClientTextUI
 TCP_IP = '127.0.0.1'
 TCP_PORT = 5005
 CLIENT_TICK = 5
-DEBUG = True
+DEBUG = False
 
 
 
 if __name__ == '__main__':
 
     print 'Setting up game'
-    game = Game(Game.MODE_CLIENT)
+    game = Game(gc.MODE_CLIENT)
     sock = ClientSocket()
     tickClock = Clock()
     ui = ClientTextUI(game)
@@ -36,20 +36,19 @@ if __name__ == '__main__':
     while game.inProgress():
         userInput = ui.input()
         packetsRecieved = sock.poll()
-        packetsToSend = game.update(packetsRecieved, userInput)
+        packetToSend = game.update(packetsRecieved, userInput)
         
         if DEBUG:
             if packetsRecieved:
                 print "Recieved"
                 for p in packetsRecieved:
                     print p.content
-            if len(packetsToSend) >0 :
+            if packetToSend :
                 print "To Send"
-                for p in packetsToSend:
-                    print p.content
+                print packetToSend.content
         
-        if packetsToSend:
-            sock.sendPackets(packetsToSend)
+        if packetToSend:
+            sock.sendPacket(packetToSend)
 
         
         

@@ -4,7 +4,7 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 from Network import ServerSocket
-from BattleBroats import Game
+from BattleBroats import Game, constants as gc
 from pygame.time import Clock
 from log import printCommunication
 
@@ -20,15 +20,15 @@ if __name__ == '__main__':
     
     print 'Setting up game'
     
-    game = Game(Game.MODE_SERVER)
-    sock = ServerSocket( game.MAX_PLAYERS, TCP_IP, TCP_PORT)
+    game = Game(gc.MODE_SERVER)
+    sock = ServerSocket( gc.MAX_PLAYERS, TCP_IP, TCP_PORT)
     tickClock = Clock()
     
     print 'Waiting for players'
     
     while game.inProgress():
         
-        if sock.numConnections() < game.MAX_PLAYERS:
+        if sock.numConnections() < gc.MAX_PLAYERS:
             newConnections = sock.acceptConnection()
             if newConnections:
                 print 'New Connection(s):', newConnections

@@ -8,7 +8,7 @@ import select
 
 
 class ServerSocket(GameSocket):
-    ""
+    "A ServerSocket Accepts connections and can send/receive packets"
    
 
     def __init__(self, numConnections, ip, port):
@@ -37,23 +37,27 @@ class ServerSocket(GameSocket):
         return newConnectionIds
     
     def sendManyPackets(self, packetDict):
+        "Send a Packet to each connection"
         for  connId in packetDict:
             
             packet = packetDict[connId]
             conn = self.conn(connId)
             
-            self.sendPackets(packet, conn)
+            self.sendPacket(packet, conn)
     
     def connIds(self):
+        "Get a list of connection Tuples (Ip, Port)"
         return self.__cons.keys()
 
     def conn(self, connectionId):
+        "Get a connection object corresponding ot a connection id"
         return self.__cons[connectionId]
     
     def numConnections(self):
         return len(self.__cons)
     
     def poll(self):
+        "Poll for incoming Packets and dropped connections"
         packets = {}
         droppedConnectionIds = []
         

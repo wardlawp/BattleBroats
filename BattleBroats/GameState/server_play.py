@@ -3,92 +3,90 @@ Created on Aug 24, 2016
 
 @author: Philip Wardlaw
 '''
-from game_states import GameState
-from Network import Packet
+from game_states import ServerState
 from BattleBroats.attack_order import AttackOrder
+import BattleBroats.constants as gc
 
 
-class ServerPlayState(GameState):
+class ServerPlayState(ServerState):
     """
-    State class defining behaviour of server during a game
-    
-    Process Turns
-        player asks for VIEW
-            respond with game board
-        player has turn and attacks
-            update board
-            
-            new player joins?
-                send OK and game boards
-                
-            all players joined?
-                move to next state
-    
+    State class defining behaviour of server at start of game
+    Wait for players to join, when enough have joined progress state
     """
+    
     START = 'START'
     VIEW = 'VIEW'
     GO = 'GO'
     NGO = 'NGO'
     
     def __init__(self, game):
-        GameState.__init__(self, game)
-        self.__currPlayerIdx = 0
+        ServerState.__init__(self, game)
         self.__complete = False
-        self.__firstIter = True
-
-    
-    def handle(self, packetsDict, inputs = None):
-        self.__responsPackets= {}
+        self.__currPlayerIdx = 0
+        self.__clientUpToDate = {}
         
-        for clientId in packetsDict:
-            self.__responsPackets[clientId] = []
-            packets = packetsDict[clientId]
-            self.__handleRequests(clientId, packets)
-        
-        if self.__firstIter:
-            clientId = self.game.player(0)
-            self.__responsPackets[clientId] = [Packet(self.GO)]
-            self.__firstIter = False
-                
-        return self.__responsPackets
-
-    
-    def __handleRequests(self, clientId, packets):
-
-        for packet in packets:
-            content = packet.content
-            if self.unicodeOrString(content):
-            
-                if content == self.START:
-                    self.__responsPackets[clientId].append(Packet(self.START))
-                elif content == self.VIEW:
-                    boards = self.game.getBoardsFromPerspective(clientId)
-                    self.__responsPackets[clientId].append(Packet(boards))
-            
-            elif isinstance(content, AttackOrder):
-                if self.game.player(self.__currPlayerIdx) == clientId:
-                    otherPlayerName = self.game.player(self.incrementPlayerIdx(self.__currPlayerIdx))
-                    otherBoard = self.game.boards(otherPlayerName)
-                    
-                    otherBoard.shoot(content)
-                    self.__responsPackets[clientId].append(Packet(self.NGO))
-                    self.__responsPackets[otherPlayerName].append(Packet(self.GO))
-
-
-     
+        for pId in game.players():
+            self.__clientUpToDate[pId] = False
 
     def incrementPlayerIdx(self, idx):
-        return (idx+1)%2
+        return (idx+1)%gc.MAX_PLAYERS
+
+    def registerHandlers(self):
+        #define methods
+        def strHandler(content, clientId):
+            if content == self.START:
+                return [self.START]
+
+            elif content == self.VIEW:
+                
+                if not self.__clientUpToDate[clientId]:
+                
+                    responseContent = self.game.getBoardsFromPerspective(clientId)
+                   
+                    if self.game.player(self.__currPlayerIdx) == clientId:
+                        responseContent.append(self.GO)
+                    else:
+                        responseContent.append(self.NGO)
+                    
+                    self.__clientUpToDate[clientId] = True
+                    return responseContent
+            
+
+        
+        def attackHandler(content, clientId):
+            if self.game.player(self.__currPlayerIdx) == clientId:
+                #preemptively change currently player idx
+                self.__currPlayerIdx = self.incrementPlayerIdx(self.__currPlayerIdx)
+                
+                otherPlayerId = self.game.player(self.__currPlayerIdx)
+                otherBoard = self.game.boards[otherPlayerId]
+                otherBoard.shoot(content)
+                
+                #Flag both players out of date
+                for pId in self.__clientUpToDate:
+                    self.__clientUpToDate[pId] = False
+                    
+
+                
+
+            
+        #register methods
+        self.handlers[unicode.__name__] = strHandler
+        self.handlers[str.__name__] = strHandler
+        self.handlers[AttackOrder.__name__] = attackHandler
+            
+    
+    def handle(self, packetsDict, inputs = None):
+        responseContent= self.handlePackets(packetsDict)
+        
+        return self.packageContent(responseContent)
+        
+
 
     def nextState(self):
         "Get the GameState that should be used next game loop"
-        if self.__complete:
-            return ServerPlayState(self.game) #may cause self not to get GC
-        else:
-            return self
-            
-    
-    
+        return self
+
 
     
     

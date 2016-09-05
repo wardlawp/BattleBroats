@@ -6,7 +6,7 @@ Created on Aug 15, 2016
 from game_socket import GameSocket
 
 class ClientSocket(GameSocket):
-    "A ClientSocket connects to a ServerSocket and can make send Requests"
+    "A ClientSocket connects to a ServerSocket and can send/receive packets"
 
     def __init__(self):
         GameSocket.__init__(self)
@@ -20,7 +20,9 @@ class ClientSocket(GameSocket):
         self.socket.close()
 
     def poll(self):
+        "Poll for incoming Packets"
         return self.receivePackets(self.socket)
     
-    def sendPackets(self, packet):
-        GameSocket.sendPackets(self, packet, self.socket)
+    def sendPacket(self, packet):
+        "Send a Packet to the server"
+        GameSocket.sendPacket(self, packet, self.socket)
