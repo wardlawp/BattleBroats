@@ -6,7 +6,7 @@ CLIENT_SELF = 'self'
 CLIENT_OTHER = 'other'
 
 BOARD_SIZE = (8,10)
-BROATS = (4,4,3,3,2,2)
+BROATS = (1, 1) #(4,4,3,3,2,2)
 
 
 EVENT_BOARD_CHANGED = 20

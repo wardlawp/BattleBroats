@@ -56,5 +56,6 @@ if __name__ == '__main__':
         
         
         tickClock.tick(CLIENT_TICK)
+    print 'Game is over'
 
     

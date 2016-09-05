@@ -42,9 +42,10 @@ if __name__ == '__main__':
             printCommunication(incomingPacketDict, outgoingPacketDict)
         
         if droppedConnections:
+            game.playersLeft(droppedConnections)
             print 'Dropped Connections', droppedConnections
-            print 'Exiting'
-            exit(1)
         
         
         tickClock.tick(SERVER_TICK)
+
+    print 'Game ending'

@@ -3,24 +3,27 @@ Created on Aug 24, 2016
 
 @author: Philip Wardlaw
 '''
-from .. import Game
-from game_states import GameState
 
-class ClientGameState(GameState):
-    'An abstract class for expressing client game behaviour'
+from game_states import ClientState
 
-    def handle(self, packets, inputs):
-        "Handle communication"
-        return
+
+
+class ClientEndState(ClientState):
+    """
+    The final ClientState, simply mark the game as complete
+    """
     
-    @abstractmethod
-    def responses(self):
-        "Get Responses after handle()"
-        return
-    
-    @abstractmethod
+    def __init__(self,game):
+        ClientState.__init__(self,game)
+
+    def registerHandlers(self):
+        pass
+              
+
+    def handle(self, packets, _input):
+        self.game.finished = True
+            
+
     def nextState(self):
-        "Get the GameState that should be used next game loop"
-        return
-    
-    
+        "This is the final state"
+        return self

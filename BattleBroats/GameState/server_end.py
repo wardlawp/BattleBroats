@@ -3,50 +3,49 @@ Created on Aug 24, 2016
 
 @author: Philip Wardlaw
 '''
-from game_states import ServerGameState
-from server_play import ServerGamePlay
-from Network import Packet, StringMessage
+from game_states import ServerState
 
-class ServerGameStart(ServerGameState):
-    'State class defining behaviour of server at start of game'
+
+class ServerEndState(ServerState):
+    """
+
+    """
     
-    JOIN = 'JOIN'
+    FINISHED = 'FINISHED' 
+    VIEW = 'VIEW'
     
     def __init__(self, game):
-        ServerGameState.__init__(self, game)
-        self.__complete = False
-        self.__responses = {}
+        ServerState.__init__(self, game)
+
+
+
+    def registerHandlers(self):
+        #define methods
+        def strHandler(content, clientId):
+            if content == self.VIEW:
+                return self.game.getBoardsFromPerspective(clientId) + [self.FINISHED]
+            else:
+                return self.FINISHED
+            
+        #register methods
+        self.handlers[unicode.__name__] = strHandler
+        self.handlers[str.__name__] = strHandler
+
+            
     
     def handle(self, packetsDict, inputs = None):
-        responses = {}
+        if len(self.game.players()) == 0:
+            self.game.finished = True
         
-        for id in packetsDict:
-            currResonses = len(responses)
-            request = packetsDict[id]
-            assert isinstance(request, Request)
-            
-            _type = type(request.content)
-            
-            if _type == StringMessage:
-                verb = request.content.msg
-                
-                if verb == self.JOIN:
-                    self.addPlayers(id)
-                    responses[id] = Protocol.Response(self.boards[id], 1)
-                    
-        self.__responses = responses
+        responseContent= self.handlePackets(packetsDict)
+        return self.packageContent(responseContent)
+        
 
-    
-
-    def responses(self):
-        "Get Responses after handle()"
-        return
-    
 
     def nextState(self):
-        "Get the GameState that should be used next game loop"
-        if self.__complete:
-            return ServerGamePlay(self.game)
-            
+        "This is the final state"
+        return self
+
+
     
     

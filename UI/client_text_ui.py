@@ -24,11 +24,12 @@ class ClientTextUI(Observer):
     def draw(self):
         if self.__requireRedraw:
             
-            print '============ Your Board ============'
+            print '===================== Your Board ====================='
             self.__drawBoard(self.subject.boards[gc.CLIENT_SELF])
-            print '============ Their Board ==========='
+            print '===================== Their Board ===================='
             self.__drawBoard(self.subject.boards[gc.CLIENT_OTHER])
-            print '===================================='
+            print '======================================================'
+            print 'Waiting for other player...'
             
             
             self.__requireRedraw = False
@@ -55,8 +56,58 @@ class ClientTextUI(Observer):
             
             print ''.join(row)
         
+
+    def getRowFromUser(self):
+        row = None
+        while row is None:
+            row = raw_input('Enter Row [1-N]:')
+            if self.__canParseInt(row):
+                row = int(row)
+                maxRow = self.subject.boards[gc.CLIENT_SELF].nRows() - 1
+                if row < 0 or row > maxRow:
+                    print "Row must be between 0 and " + str(maxRow)
+                    row = None
+            else:
+                print "Row must be a number"
+                row = None
+        
+        return row
+    
+    def getColFromUser(self):
+        colInput = None
+        while colInput is None:
+            colInput = raw_input('Enter Column [A-Z]')
+            
+            
+            if  len(colInput) == 1:
+                maxCol = self.subject.boards[gc.CLIENT_SELF].nCols() 
+                acceptableChars = string.ascii_uppercase[:maxCol]
+                if colInput[0] not in acceptableChars:
+                    print "Column must be in {" + ','.join(acceptableChars) + '}'
+                    colInput = None
+            else:
+                print "Column must be a single letter"
+                colInput = None
+                
+            
+        return string.ascii_uppercase.index(colInput[0])
+
     def input(self):
         if isinstance(self.subject.state, BattleBroats.GameState.ClientPlayState):
             if self.subject.state.myGo:
-                move = str(input('?'))
-                return [int(move[0]), int(move[1])]
+                print "It's your go!"
+                
+                row = self.getRowFromUser()
+                col = self.getColFromUser()
+
+                return [row, col]
+            
+            
+    def __canParseInt(self, _input):
+        try:
+            int(_input)
+            return True
+        except:
+            return False
+        
+        

@@ -28,6 +28,7 @@ class Game(Subject):
         self.__players = []
         self.boards = {}
         self.__observers = []
+        self.finished = False
         
     
     def getBoardsFromPerspective(self, playerId):
@@ -40,6 +41,10 @@ class Game(Subject):
     
     def players(self):
         return self.__players
+    
+    def playersLeft(self, players):
+        for player in players:
+            self.__players.remove(player)
     
     def updateBoards(self, boardDict):
         changed = False
@@ -66,7 +71,7 @@ class Game(Subject):
             o.recieveEvent(event)
     
     def inProgress(self):
-        return True
+        return not self.finished
     
     def full(self):
         return MAX_PLAYERS <= len(self.__players)

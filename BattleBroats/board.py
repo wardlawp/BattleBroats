@@ -23,6 +23,15 @@ class Board(Transmittable):
         else:
             self.__data = data
     
+    
+    def allDead(self):
+        for x in range(self.nRows()):
+            for y in range(self.nCols()):
+                if self.__data[x][y] == Tile.BROAT:
+                    return False
+        
+        return True
+    
     def nCols(self):
         return len(self.__data[0])
     

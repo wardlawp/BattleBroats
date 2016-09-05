@@ -8,6 +8,8 @@ from game_states import ClientState
 from server_play import  ServerPlayState
 from BattleBroats.attack_order import AttackOrder
 from BattleBroats.board_update import BoardUpdate
+from client_end import ClientEndState
+from server_end import ServerEndState
 
 
 
@@ -21,6 +23,7 @@ class ClientPlayState(ClientState):
         ClientState.__init__(self,game)
         self.__attackOrder = None
         self.myGo = False
+        self.__finished = False
     
 
     def registerHandlers(self):
@@ -30,6 +33,8 @@ class ClientPlayState(ClientState):
                 self.myGo = True
             elif content == ServerPlayState.NGO:
                 self.myGo = False
+            elif content == ServerEndState.FINISHED:
+                self.__finished = True
             
 
 
@@ -68,7 +73,10 @@ class ClientPlayState(ClientState):
     
     def nextState(self):
         "Get the GameState that should be used next game loop"
-        return self
+        if self.__finished:
+            return ClientEndState(self.game)
+        else:
+            return self
 
 
 
