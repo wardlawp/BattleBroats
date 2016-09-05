@@ -30,9 +30,9 @@ class Game(Subject):
         self.__mode = mode
         
         if mode == self.MODE_SERVER:
-            self.__state = ServerStartState(self)
+            self.state = ServerStartState(self)
         else:
-            self.__state = ClientStartState(self)
+            self.state = ClientStartState(self)
 
         self.__players = []
         self.boards = {}
@@ -43,7 +43,9 @@ class Game(Subject):
         otherID = [x for x in self.__players if x != playerId][0]
         return [self.boards[playerId], self.boards[otherID].getEnemyView()]
 
-
+    def player(self, idx):
+        return self.__players[idx]
+    
     def updateBoards(self, boardDict):
         changed = False
         
@@ -89,6 +91,6 @@ class Game(Subject):
             
  
     def update(self, packetDict, inputs = None):
-        packets = self.__state.handle(packetDict, inputs)
-        self.__state = self.__state.nextState()
+        packets = self.state.handle(packetDict, inputs)
+        self.state = self.state.nextState()
         return packets

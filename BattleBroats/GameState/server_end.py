@@ -5,7 +5,7 @@ Created on Aug 24, 2016
 '''
 from game_states import ServerGameState
 from server_play import ServerGamePlay
-from Protocol import Request, StringMessage
+from Network import Packet, StringMessage
 
 class ServerGameStart(ServerGameState):
     'State class defining behaviour of server at start of game'

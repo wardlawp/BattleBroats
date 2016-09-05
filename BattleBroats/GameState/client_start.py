@@ -7,7 +7,7 @@ Created on Aug 24, 2016
 from game_states import GameState
 from client_play import ClientPlayState
 from server_start import ServerStartState, ServerPlayState
-from Protocol import Response, Request, StringMessage
+from Network import Packet
 
 
 class ClientStartState(GameState):
@@ -21,35 +21,35 @@ class ClientStartState(GameState):
         self.__gameStarting = False
     
 
-    def __handleServerResponses(self, response):
-        if response and response.status == Response.STATUS_OK:
-            content = response.content
-            if isinstance(content, StringMessage):
-                msg = content.msg
-                if msg == ServerStartState.JOIN:
+    def __handleServerPackets(self, packets):
+        for packet in packets:
+            content = packet.content
+            if self.unicodeOrString(content):
+    
+                if content == ServerStartState.JOIN:
                     self.__serverAcknowledgedJoin = True
-                if msg == ServerPlayState.START:
+                if content == ServerPlayState.START:
                     self.__gameStarting = True
                     self.game.addPlayers('self')
                     self.game.addPlayers('other')
 
 
-    def __generateRequests(self):
-        request = None
+    def __generatePackets(self):
+        packets = []
         if not self.__askedToJoin:
-            request = Request(StringMessage(ServerStartState.JOIN))
+            packets.append(Packet(ServerStartState.JOIN))
             self.__askedToJoin = True
         elif not self.__gameStarting:
-            request = Request(StringMessage(ServerPlayState.START))
-        return request
+            packets.append(Packet(ServerPlayState.START))
+        return packets
 
-    def handle(self, response, inputs):
+    def handle(self, packets, inputs):
 
         #Handle Responses
-        self.__handleServerResponses(response) 
+        self.__handleServerPackets(packets) 
                     
         #Ask Server Questions
-        return self.__generateRequests()
+        return self.__generatePackets()
             
 
     

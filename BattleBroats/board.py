@@ -4,8 +4,8 @@ Created on Aug 16, 2016
 @author: Philip Wardlaw
 '''
 from tile import Tile
-from Protocol import Transmittable
-import json
+from Network import Transmittable
+from attack_order import AttackOrder
 from random import randint, shuffle
 
 class Board(Transmittable):
@@ -69,7 +69,13 @@ class Board(Transmittable):
         
         return False
             
+    def shoot(self, attackOrder):
+        assert isinstance(attackOrder, AttackOrder)
         
+        if self.__data[attackOrder.x][attackOrder.y] == Tile.WATER:
+            self.__data[attackOrder.x][attackOrder.y] = Tile(Tile.SHOT)
+        else:
+            self.__data[attackOrder.x][attackOrder.y] = Tile(Tile.DEAD_BROAT)
         
     def getEnemyView(self):
         enemyViewData = []

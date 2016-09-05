@@ -26,3 +26,6 @@ class GameState(object):
         "Get the GameState that should be used next game loop"
         return
     
+    @staticmethod
+    def unicodeOrString(_input):
+        return isinstance(_input, str) or isinstance(_input,unicode)

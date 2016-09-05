@@ -5,7 +5,7 @@ Created on Aug 24, 2016
 '''
 from game_states import GameState
 from server_play import ServerPlayState
-from Protocol import Response, StringMessage
+from Network import Packet
 
 class ServerStartState(GameState):
     """
@@ -28,30 +28,31 @@ class ServerStartState(GameState):
 
     
     def handle(self, packetsDict, inputs = None):
-        responses = {}
+        responsePackets= {}
         
         for clientId in packetsDict:
-
-            request = packetsDict[clientId]
-            responses[clientId] = self.__handleRequests(clientId, request.content)
+            packets = packetsDict[clientId]
+            responsePackets[clientId] = self.__handlePackets(clientId, packets)
             
                 
-        return  responses
+        return responsePackets
 
     
-    def __handleRequests(self, clientId, content):
-        
-        if isinstance(content, StringMessage) and content.msg == self.JOIN:
-            if self.game.canAddPlayer(clientId):
-                self.game.addPlayers(clientId)
+    def __handlePackets(self, clientId, packets):
+        responsePackets= []
+        for packet in packets:
+            content = packet.content
             
-            self.__complete = self.game.full()
-            
-            return Response(StringMessage(self.JOIN), Response.STATUS_OK)
+            if self.unicodeOrString(content) and content == self.JOIN:
+                if self.game.canAddPlayer(clientId):
+                    self.game.addPlayers(clientId)
+                
+                self.__complete = self.game.full()
+                
+                responsePackets.append(Packet(self.JOIN))
         
-        return Response(None, Response.STATUS_NO)      
-     
-
+        return responsePackets   
+    
     
 
     def nextState(self):

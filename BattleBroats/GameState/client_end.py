@@ -4,7 +4,7 @@ Created on Aug 24, 2016
 @author: Philip Wardlaw
 '''
 from .. import Game
-from BattleBroats.GameState.game_states import GameState
+from game_states import GameState
 
 class ClientGameState(GameState):
     'An abstract class for expressing client game behaviour'

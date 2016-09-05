@@ -4,59 +4,64 @@ Created on Aug 16, 2016
 @author: Philip Wardlaw
 '''
 import json
-from abc import ABCMeta, abstractproperty
 from transmittable import Transmittable
-
+from datetime import datetime, time
 
 class Packet(object):
     "Packet of information that can be sent or received"
-    __metaclass__ = ABCMeta
-    
-    STATUS_KEY='status'
+
+    TIME_KEY='time stamp'
     CONTENT_MODULE_KEY='contentModule'
     CONTENT_CLASS_KEY='contentClass'
     CONTENT_KEY='content'
-    KEYS = [STATUS_KEY, CONTENT_MODULE_KEY, CONTENT_CLASS_KEY, CONTENT_KEY]
+    TIMESTAMP_FORMAT="%Y-%m-%d %H:%M:%S.%f"
+    KEYS = [ TIME_KEY, CONTENT_MODULE_KEY, CONTENT_CLASS_KEY, CONTENT_KEY]
 
-    @abstractproperty
-    def status(self):
-        "Status attribute must return integer"
-        return
-       
-    @abstractproperty
-    def content(self):
-        "Content attribute must return Transmittable or list of Transmittables"
-        return 
+    def __init__(self, content, timestamp = None):
 
-    @staticmethod
-    def testConstructorContentInputs(content):
+        if content:
+            self.__testConstructorContentInputs(content)
+            self.content = content
+            
+        if timestamp is None:
+            self.timestamp = datetime.now()
+        else:
+            self.timestamp = timestamp
+
+
+
+    def __testConstructorContentInputs(self, content):
+        def __test(item):
+            errorMsg = 'Array elements must be objects implementing the Transmittable Interface or be an instance of str'
+            isTransmittable = isinstance(item, Transmittable)
+            isStr = isinstance(item, str) or isinstance(item, unicode)
+            assert isTransmittable or isStr, errorMsg
+            
         if isinstance(content, list):
-            errorMsg = 'Array elements must be objects implementing the Transmittable Interface'
             for c in content:
-                assert isinstance(c, Transmittable), errorMsg
+                __test(c)   
         
         else:
-            errorMsg = 'Content must implement Transmittable Interface'
-            assert isinstance(content, Transmittable), errorMsg
+            __test(content)
             
     @staticmethod
-    def deserialize(_type, string):
+    def deserialize(string):
         "Construct a _type with internal Transmittable from serialized Packet"
-        status, contentModule, contentClass, content = Packet.__deserialize(string)
-
+        timestampStr, contentModule, contentClass, content = Packet.__deserialize(string)
+        
         transmittables = Packet.__deserializeContentPayload(contentModule, contentClass, content)
-
-        return _type(transmittables, status)
+        timestamp = datetime.strptime(timestampStr, Packet.TIMESTAMP_FORMAT) 
+        
+        return Packet(transmittables, timestamp)
     
     def serialize(self):
         "Prepare the body of the Packet to be transmitted"
-        assert isinstance(self, Packet), 'Invalid object supplied, must be of type Packet'
-        
-        status = self.status
+
         contentModule, contentClass, content = self.__serializeContentPayload()
-        
        
-        data = {Packet.STATUS_KEY: status, 
+       
+
+        data = {Packet.TIME_KEY: datetime.now().strftime(self.TIMESTAMP_FORMAT) , 
                 Packet.CONTENT_MODULE_KEY: contentModule, 
                 Packet.CONTENT_CLASS_KEY: contentClass, 
                 Packet.CONTENT_KEY: content}
@@ -72,7 +77,7 @@ class Packet(object):
         for key in Packet.KEYS:
             assert key in data.keys(), "Serial data is missing elements"
         
-        return  [data[Packet.STATUS_KEY], 
+        return  [data[Packet.TIME_KEY],
                 data[Packet.CONTENT_MODULE_KEY],
                 data[Packet.CONTENT_CLASS_KEY],
                 data[Packet.CONTENT_KEY]]
@@ -97,6 +102,8 @@ class Packet(object):
                 
             return contentModule, contentClass, content
         else:
+            if isinstance(self.content, str):
+                return None, self.content.__class__.__name__, self.content
             contentModule =  self.content.__module__ 
             contentClass = self.content.__class__.__name__
             content = self.content.serialize()
@@ -105,9 +112,6 @@ class Packet(object):
     
     @staticmethod
     def __deserializeContentPayload(contentModule, contentClass, content):
-        
-        if contentModule == None:
-            return None
         
         if not isinstance(contentModule, list):
                 return Packet.__deserializeTransmittable(contentModule,
@@ -123,11 +127,15 @@ class Packet(object):
         
     @staticmethod
     def __deserializeTransmittable( contentModule, contentClass, content):
-        _module = __import__(contentModule)
-        _class = getattr(_module, contentClass)
+        
 
-        assert issubclass(_class, Transmittable)
-        obj = _class.deserialize(content)
-        return obj
+        if contentClass == 'str':
+            return content
+        else:
+            _module = __import__(contentModule)
+            _class = getattr(_module, contentClass)
+            assert issubclass(_class, Transmittable)
+            obj = _class.deserialize(content)
+            return obj
             
         

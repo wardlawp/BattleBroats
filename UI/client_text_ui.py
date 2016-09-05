@@ -1,6 +1,7 @@
 from observer import Observer
 from BattleBroats import Game, Board, Tile
 import string
+import BattleBroats
 
 
 class ClientTextUI(Observer):
@@ -55,4 +56,7 @@ class ClientTextUI(Observer):
             print ''.join(row)
         
     def input(self):
-        return 
+        if isinstance(self.subject.state, BattleBroats.GameState.ClientPlayState):
+            if self.subject.state.ourGo:
+                move = input('?')
+                return [move[0], move[1]]

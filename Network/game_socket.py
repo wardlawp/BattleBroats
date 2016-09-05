@@ -4,8 +4,8 @@ Created on Aug 15, 2016
 @author: Philip Wardlaw
 '''
 import socket
-from Protocol import Response
-from Protocol import Request
+from packet import Packet
+import errno
 
 class ConnectionEndedException(Exception):
     
@@ -19,9 +19,47 @@ class GameSocket(object):
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #Set Socket as non blocking so we can process connections async
+        self.socket.setblocking(0)
         self.__msgOverflow = ''
+        
+    def receivePacket(self, conn):
+        "Receive a single Packet Async"
+        try:
+            msg = self.__receiveString(conn) 
+            return Packet.deserialize(msg)
+            
+        except socket.error, e:
+            if not self.__isAsynResponse(e):
+                raise e
+            
+        return None
+    
+    def receivePackets(self, conn):
+        "Receive all pending Packet Async"
+        packets = []
+        while True:
+            packet = self.receivePacket(conn)
+            
+            if packet is not None:
+                packets.append(packet)
+            else:
+                break
+            
+        return packets
+    
+    def sendPackets(self, packets, conn):
+        "Send a Packet"
+        for p in packets:
+            assert isinstance(p, Packet)
+            self.__sendString(conn, p.serialize())
 
-    def sendString(self, conn, msg):
+
+    def __isAsynResponse(self, e):
+        err = e.args[0]
+        return err == errno.EAGAIN or err == errno.EWOULDBLOCK
+
+    def __sendString(self, conn, msg):
         "Send a string to a connection/socket"
 
         assert isinstance(msg, str), 'msg must be string'
@@ -34,9 +72,7 @@ class GameSocket(object):
                 raise ConnectionEndedException("Connection has closed")
             totalsent = totalsent + sent
 
-    
-
-    def receiveString(self, conn):
+    def __receiveString(self, conn):
         "Receive a string from a connection/socket"
         chunks = []
 
@@ -54,7 +90,6 @@ class GameSocket(object):
 
         return msg
     
-
     def __getChunk(self, conn, chunkSize):
         chunk = conn.recv(chunkSize)
 

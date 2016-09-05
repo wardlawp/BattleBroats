@@ -3,7 +3,7 @@ Created on Aug 15, 2016
 
 @author: Philip Wardlaw
 '''
-from Sockets import ServerSocket
+from Network import ServerSocket
 from BattleBroats import Game
 from pygame.time import Clock
 from log import printCommunication
@@ -33,13 +33,13 @@ if __name__ == '__main__':
             if newConnections:
                 print 'New Connection(s):', newConnections
 
-        droppedConnections, requestsDict = sock.poll()
-        responsesDict = game.update(requestsDict, None)
+        droppedConnections, incomingPacketDict = sock.poll()
+        outgoingPacketDict = game.update(incomingPacketDict, None)
         
-        sock.sendManyResponses(responsesDict)
+        sock.sendManyPackets(outgoingPacketDict)
 
         if DEBUG:
-            printCommunication(requestsDict, responsesDict)
+            printCommunication(incomingPacketDict, outgoingPacketDict)
         
         if droppedConnections:
             print 'Dropped Connections', droppedConnections

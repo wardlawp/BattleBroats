@@ -5,7 +5,7 @@ Created on Aug 15, 2016
 '''
 
 
-from Sockets import ClientSocket
+from Network import ClientSocket
 from BattleBroats import Game
 from pygame.time import Clock
 from log import printCommunication
@@ -14,7 +14,7 @@ from UI import ClientTextUI
 TCP_IP = '127.0.0.1'
 TCP_PORT = 5005
 CLIENT_TICK = 5
-DEBUG = False
+DEBUG = True
 
 
 
@@ -30,24 +30,30 @@ if __name__ == '__main__':
     
     sock.connect(TCP_IP, TCP_PORT)
     
-    request = None
-    response = None
+
     userInput = None
     
     while game.inProgress():
-       
-        if request:
-            response = sock.sendRequest(request)
-        else:
-            response = None
-            
-        request  = game.update(response, userInput)
+        userInput = ui.input()
+        packetsRecieved = sock.poll()
+        packetsToSend = game.update(packetsRecieved, userInput)
         
         if DEBUG:
-            printCommunication([request], [response])
+            if packetsRecieved:
+                print "Recieved"
+                for p in packetsRecieved:
+                    print p.content
+            if len(packetsToSend) >0 :
+                print "To Send"
+                for p in packetsToSend:
+                    print p.content
+        
+        if packetsToSend:
+            sock.sendPackets(packetsToSend)
+
+        
         
         ui.draw()
-        userInput = ui.input()
         
         
         tickClock.tick(CLIENT_TICK)

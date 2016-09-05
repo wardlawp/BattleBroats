@@ -6,7 +6,8 @@ Created on Aug 24, 2016
 
 from game_states import GameState
 from server_play import ServerPlayState
-from Protocol import Response, Request, StringMessage
+from Network import Packet
+from BattleBroats.attack_order import AttackOrder
 
 class ClientPlayState(GameState):
     'An abstract class for expressing client game behaviour'
@@ -14,47 +15,44 @@ class ClientPlayState(GameState):
     def __init__(self,game):
         GameState.__init__(self,game)
         self.__attackOrder = None
+        self.ourGo = False
 
-    def handle(self, response, inputs):
+    def handle(self, packets, inputs):
         #Handle Responses
-        self.__handleServerResponses(response) 
+        self.__handleIncomingPackets(packets) 
         
         #Handle user input
         self.__handleUserInput(inputs)
         
         #Ask Server Questions
-        return self.__generateRequests()
+        return self.__outgoingPacket()
     
     def __handleUserInput(self, inputs):
         self.__attackOrder = None
         if isinstance(inputs, list):
-            self.__attackOrder = inputs
+            self.__attackOrder = AttackOrder(inputs[0], inputs[1])
 
-    def __handleServerResponses(self, response):
+    def __handleIncomingPackets(self, packets):
         
-        if not response:
-            return
-        
-        if response.status == Response.STATUS_OK:
-            content = response.content
+        for packet in packets:
+    
+            content = packet.content
             
-            if isinstance(content, list) and isinstance(content[0], StringMessage):
-                msg = content[0].msg
-                if msg == ServerPlayState.VIEW:
-                    boards = {'self': content[1], 'other': content[2]}
-                    self.game.updateBoards(boards)
+            if isinstance(content, list) and len(content) == 2:
+                boards = {'self': content[0], 'other': content[1]}
+                self.game.updateBoards(boards)
                     
-            if isinstance(content, StringMessage) and content.msg == ServerPlayState.GO:
-                self.game.setTurn('self')
-        
-        if response.status == Response.STATUS_NO:
-            if isinstance(content, StringMessage) and content.msg == ServerPlayState.GO:
-                self.game.setTurn('other')
+            if self.unicodeOrString(content) and content == ServerPlayState.GO:
+                print "My go"
+                self.ourGo = True
+            
+            if self.unicodeOrString(content) and content == ServerPlayState.NGO:
+                self.ourGo = False
 
 
-    def __generateRequests(self):
-        request = Request(StringMessage(ServerPlayState.VIEW))
-        return request
+    def __outgoingPacket(self):
+        return [Packet(ServerPlayState.VIEW)]
+
     
 
     def nextState(self):

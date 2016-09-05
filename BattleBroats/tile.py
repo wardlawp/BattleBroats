@@ -5,7 +5,7 @@ Created on Aug 16, 2016
 '''
 
 
-from Protocol import Transmittable
+from Network import Transmittable
 
 class Tile(Transmittable):
 
