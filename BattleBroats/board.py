@@ -9,15 +9,9 @@ from attack_order import AttackOrder
 from random import randint, shuffle
 
 class Board(Transmittable):
-    '''
-    classdocs
-    '''
-
+    "The Game Board, housing Tiles"
 
     def __init__(self, nCols = None, nRows= None, data = None):
-        '''
-        Constructor
-        '''
         if data is None:
             self.__data = [[Tile() for y in xrange(nCols)] for x in xrange(nRows)]
         else:
@@ -25,6 +19,7 @@ class Board(Transmittable):
     
     
     def allDead(self):
+        "Test if all play Tiles are 'Dead'"
         for x in range(self.nRows()):
             for y in range(self.nCols()):
                 if self.__data[x][y] == Tile.BROAT:
@@ -39,10 +34,11 @@ class Board(Transmittable):
         return len(self.__data)
 
     def element(self, rowIdx, colIdx):
-        return  self.__data[rowIdx][colIdx]
+        return self.__data[rowIdx][colIdx]
     
     
     def addBroats(self, broats):
+        "Add broats to the Board"
         for broat in broats:
             notPlaced = True
             while notPlaced: #Potential for inf loop if we actually cant place 

@@ -24,11 +24,11 @@ class ClientTextUI(Observer):
     def draw(self):
         if self.__requireRedraw:
             
-            print '===================== Your Board ====================='
+            print '=============== Your Board ================'
             self.__drawBoard(self.subject.boards[gc.CLIENT_SELF])
-            print '===================== Their Board ===================='
+            print '=============== Their Board ==============='
             self.__drawBoard(self.subject.boards[gc.CLIENT_OTHER])
-            print '======================================================'
+            print '==========================================='
             print 'Waiting for other player...'
             
             
