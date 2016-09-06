@@ -1,5 +1,5 @@
 # BattleBroats
-A Battle Ships multiplayer game!
+A Battleships multiplayer game!
 
 ## Install
 
