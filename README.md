@@ -4,7 +4,7 @@ A Battle Ships multiplayer game!
 ## Install
 
 - All you need is python 2.7.x and pygame
-- Run python -m pip install requirements.txt to get pygame
+- Run "python -m pip install requirements.txt" to get pygame
 
 ## How to Play
 
