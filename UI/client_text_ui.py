@@ -6,8 +6,10 @@ from BattleBroats import constants as gc
 
 class ClientTextUI(Observer):
     
-    TILE_TRANSLATION = {Tile.WATER: ' ', Tile.BROAT: 'B', 
-                        Tile.SHOT: 'X', Tile.DEAD_BROAT: 'D'}
+    TILE_TRANSLATION = {Tile.WATER: '\033[1m\033[94m#\033[0m',
+                        Tile.BROAT: '\033[1m\033[92mB\033[0m',
+                        Tile.SHOT: '\033[1m\033[93mX\033[0m',
+                        Tile.DEAD_BROAT: '\033[1m\033[91mD\033[0m'}
     
     def __init__(self, game):
         assert isinstance(game, Game)
