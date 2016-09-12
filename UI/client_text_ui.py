@@ -3,13 +3,10 @@ from BattleBroats import Game, Board, Tile
 import string
 import BattleBroats
 from BattleBroats import constants as gc
+import sys
 
 class ClientTextUI(Observer):
-    
-    TILE_TRANSLATION = {Tile.WATER: '\033[1m\033[94m#\033[0m',
-                        Tile.BROAT: '\033[1m\033[92mB\033[0m',
-                        Tile.SHOT: '\033[1m\033[93mX\033[0m',
-                        Tile.DEAD_BROAT: '\033[1m\033[91mD\033[0m'}
+    "The most simple text based UI"
     
     def __init__(self, game):
         assert isinstance(game, Game)
@@ -17,6 +14,20 @@ class ClientTextUI(Observer):
         self.__requireRedraw = False
         
         self.__columnChars = list(string.ascii_uppercase)
+        
+        #On Linux and Mac OS we will use coloured characters
+        #On Windows we will use plain characters
+        if sys.platform in ("linux", "linux2","darwin"):
+            self.TILE_TRANSLATION = {Tile.WATER: '\033[1m\033[94m#\033[0m',
+                        Tile.BROAT: '\033[1m\033[92mB\033[0m',
+                        Tile.SHOT: '\033[1m\033[93mX\033[0m',
+                        Tile.DEAD_BROAT: '\033[1m\033[91mD\033[0m'}
+        else:
+            self.TILE_TRANSLATION = {Tile.WATER: ' ',
+                        Tile.BROAT: 'B',
+                        Tile.SHOT: 'X',
+                        Tile.DEAD_BROAT: 'F'}
+            
         
 
     def recieveEvent(self, event):
@@ -43,11 +54,15 @@ class ClientTextUI(Observer):
         template =   '  {0}  |'
         br =         '------'
         headerRow = ['     |']
+        
+        #Build header row
         for y in range(board.nCols()):
             headerRow.append(template.format(self.__columnChars[y]))
         
+        #Print header row
         print ''.join(headerRow)
         
+        #Build board rows
         for x in range(board.nRows()):
             print br*(board.nCols() +1 )
             row = [template.format(x)]
@@ -55,11 +70,12 @@ class ClientTextUI(Observer):
                 herp =board.element(x, y)
                 _char = self.TILE_TRANSLATION[herp.type]
                 row.append(str(template.format(_char)))
-            
+            #Print board row
             print ''.join(row)
         
 
     def getRowFromUser(self):
+        "Get the user's input for row selection"
         row = None
         while row is None:
             row = raw_input('Enter Row [1-N]:')
@@ -76,14 +92,15 @@ class ClientTextUI(Observer):
         return row
     
     def getColFromUser(self):
+        "Get the user's input for column selection"
         colInput = None
         while colInput is None:
-            colInput = raw_input('Enter Column [A-Z]')
+            colInput = raw_input('Enter Column [a-z]:')
             
             
             if  len(colInput) == 1:
                 maxCol = self.subject.boards[gc.CLIENT_SELF].nCols() 
-                acceptableChars = string.ascii_uppercase[:maxCol]
+                acceptableChars = string.ascii_lowercase[:maxCol]
                 if colInput[0] not in acceptableChars:
                     print "Column must be in {" + ','.join(acceptableChars) + '}'
                     colInput = None
@@ -92,9 +109,10 @@ class ClientTextUI(Observer):
                 colInput = None
                 
             
-        return string.ascii_uppercase.index(colInput[0])
+        return string.ascii_lowercase.index(colInput[0])
 
     def input(self):
+        "Get the users input. Warning this method will block whilst the palyer enters input"
         if isinstance(self.subject.state, BattleBroats.GameState.ClientPlayState):
             if self.subject.state.myGo:
                 print "It's your go!"
