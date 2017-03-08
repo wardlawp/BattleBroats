@@ -1,6 +1,8 @@
 # BattleBroats
 A multiplayer TCP/IP Python text based Battleships game!
 
+![Gameplay Screenshot](http://philip-wardlaw.com/images/broat.png)
+
 ## Install
 
 - All you need is python 2.7.x and pygame
