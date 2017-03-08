@@ -1,5 +1,5 @@
 # BattleBroats
-A Battleships multiplayer game!
+A multiplayer TCP/IP Python text based Battleships game!
 
 ## Install
 
